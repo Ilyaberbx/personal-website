@@ -28,7 +28,11 @@ const VIEW_CSS_VARS = {
   ['--view-h']: VIEW_H,
 } as CSSProperties
 
-export function World() {
+type Props = {
+  onSwitchView: () => void
+}
+
+export function World({ onSwitchView }: Props) {
   const { canvasRef, modal, focus, pointerHandlers, closeModal } = useWorld()
 
   const stationFocus = focus?.kind === 'station' ? getStationContent(focus.id) : null
@@ -38,7 +42,7 @@ export function World() {
 
   return (
     <div className={`${styles.world} scanlines`}>
-      <HUD />
+      <HUD onSwitchView={onSwitchView} />
 
       <div className={styles.viewport}>
         <canvas

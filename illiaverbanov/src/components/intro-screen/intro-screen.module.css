@@ -67,18 +67,44 @@
   margin: 4px 0 8px;
 }
 
-.cta {
+.ctaRow {
   display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+  align-items: stretch;
+  width: min(360px, 100%);
+}
+
+.cta {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   font-family: var(--font-display);
   font-size: 12px;
   letter-spacing: 2px;
-  padding: 12px 20px;
-  background: var(--c-primary-dark);
+  padding: 14px 20px;
+  min-height: 48px;
   border: 4px solid var(--c-border);
   box-shadow: 0 0 0 4px var(--c-bg-dark), 0 8px 0 4px rgba(0, 0, 0, 0.5);
-  margin-top: 8px;
+  cursor: pointer;
+  color: var(--c-text);
+  text-transform: uppercase;
+  transition: background 80ms steps(2);
+}
+
+.ctaPrimary { background: var(--c-primary-dark); }
+.ctaPrimary:hover, .ctaPrimary:focus-visible { background: var(--c-primary); outline: none; }
+
+.ctaSecondary {
+  background: var(--c-bg-dark);
+  color: var(--c-secondary);
+}
+.ctaSecondary:hover, .ctaSecondary:focus-visible {
+  background: var(--c-primary-dark);
+  color: var(--c-text);
+  outline: none;
 }
 
 .ctaBlink {
@@ -86,6 +112,19 @@
   height: 14px;
   background: var(--c-text);
   animation: blink 1s steps(2, start) infinite;
+}
+
+.keyHint {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--c-secondary);
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+@media (min-width: 480px) {
+  .ctaRow { flex-direction: row; width: auto; }
 }
 
 .controls {

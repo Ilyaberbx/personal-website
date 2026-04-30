@@ -80,6 +80,12 @@
   box-shadow: inset 0 -2px 0 var(--c-primary-dark);
 }
 
+.toggle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
 @media (min-width: 640px) {
   .hud { padding: 10px 14px; gap: 12px; }
   .left { padding: 8px 14px; }

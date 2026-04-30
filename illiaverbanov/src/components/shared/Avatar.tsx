@@ -1,10 +1,9 @@
-export const AVATAR_PX = 6
+import { PixelArt } from './PixelArt'
 
-export const AVATAR_DROP_SHADOW = '6px 6px 0 rgba(0,0,0,0.55)'
+const AVATAR_PX = 6
+const AVATAR_DROP_SHADOW = '6px 6px 0 rgba(0,0,0,0.55)'
 
-// 16x16 grid expressed as a string per row.
-// colors: B=bg, S=skin, H=hair, P=primary(violet), D=primaryDark, C=cape(secondary), K=ink, X=skinShadow
-export const AVATAR_GRID = [
+const AVATAR_GRID = [
   '................',
   '................',
   '.....HHHHHH.....',
@@ -23,7 +22,7 @@ export const AVATAR_GRID = [
   '.....KK..KK.....',
 ] as const
 
-export const AVATAR_COLORS = {
+const AVATAR_COLORS = {
   '.': 'transparent',
   B: 'var(--c-bg)',
   S: 'var(--c-text)',
@@ -34,3 +33,18 @@ export const AVATAR_COLORS = {
   C: 'var(--c-secondary)',
   K: '#0e0a1d',
 } as const
+
+type Props = {
+  px?: number
+}
+
+export function Avatar({ px = AVATAR_PX }: Props = {}) {
+  return (
+    <PixelArt
+      grid={AVATAR_GRID}
+      colors={AVATAR_COLORS}
+      px={px}
+      dropShadow={AVATAR_DROP_SHADOW}
+    />
+  )
+}

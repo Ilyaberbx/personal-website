@@ -2,7 +2,9 @@ import type { ControlLegendItem } from './types'
 
 export const UI_COPY = {
   intro: {
-    cta: 'PRESS ANY KEY',
+    cta: 'ENTER WORLD',
+    ctaPlain: 'VIEW AS PAGE',
+    keyHint: 'Any key to enter · [P] for plain view',
     eraSuffix: 'since 2021',
   },
   controls: {

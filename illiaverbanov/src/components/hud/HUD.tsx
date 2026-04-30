@@ -1,7 +1,12 @@
+import { ViewToggle } from '../shared/ViewToggle'
 import { useHud } from './use-hud'
 import styles from './hud.module.css'
 
-export function HUD() {
+type Props = {
+  onSwitchView: () => void
+}
+
+export function HUD({ onSwitchView }: Props) {
   const { name, title, level, levelPercent } = useHud()
 
   return (
@@ -24,6 +29,9 @@ export function HUD() {
             <div className={styles.barFill} style={{ width: `${levelPercent}%` }} />
           </div>
         </div>
+      </div>
+      <div className={styles.toggle}>
+        <ViewToggle target="plain" onClick={onSwitchView} />
       </div>
     </div>
   )
