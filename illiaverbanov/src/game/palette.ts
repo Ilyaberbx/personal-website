@@ -1,4 +1,3 @@
-// Custom 5-color pixel palette.
 export const PAL = {
   bg: '#242038',
   primary: '#9067C6',
@@ -7,7 +6,6 @@ export const PAL = {
   text: '#F7ECE1',
 } as const
 
-// Extended derived shades (used only for canvas sprites; CSS uses --c-* vars).
 export const SHADE = {
   bgDark: '#16132a',
   bgMid: '#1c1830',
@@ -16,7 +14,6 @@ export const SHADE = {
   secondaryDark: '#5e58a4',
   borderDim: '#9b94a3',
   shadow: 'rgba(0,0,0,0.55)',
-  // Accent colors used sparingly for tiles/sprites (still palette-aligned)
   grass: '#3a3055',
   grassAlt: '#312957',
   grassEdge: '#4d4170',
@@ -29,7 +26,6 @@ export const SHADE = {
   treeLeafLight: '#8d77c6',
   flowerYellow: '#f7e1a1',
   flowerPink: '#d889c9',
-  // Used for sprite blacks (eyes, outline)
   ink: '#0e0a1d',
 } as const
 

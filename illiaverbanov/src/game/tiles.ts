@@ -1,7 +1,6 @@
-// Tile sprites — drawn directly to an offscreen canvas at startup, then
-// blitted into the world via drawImage. Each tile is 16x16 logical pixels.
 import { PAL, SHADE } from './palette'
 import { TILE, type TileId } from './map'
+import type { PixelPoint, PixelRect } from './sprites.types'
 
 export const TILE_SIZE = 16
 
@@ -14,51 +13,65 @@ function makeCanvas(size = TILE_SIZE): HTMLCanvasElement {
   return c
 }
 
+function fillPoints(ctx: CanvasRenderingContext2D, color: string, points: readonly PixelPoint[]) {
+  ctx.fillStyle = color
+  for (const { x, y } of points) ctx.fillRect(x, y, 1, 1)
+}
+
+function fillRects(ctx: CanvasRenderingContext2D, color: string, rects: readonly PixelRect[]) {
+  ctx.fillStyle = color
+  for (const r of rects) ctx.fillRect(r.x, r.y, r.w, r.h)
+}
+
+const GRASS_TEXTURE_DOTS: readonly PixelPoint[] = [
+  { x: 4, y: 2 }, { x: 9, y: 5 }, { x: 14, y: 9 }, { x: 3, y: 12 }, { x: 8, y: 14 },
+]
+const GRASS_ALT_TEXTURE_DOTS: readonly PixelPoint[] = [
+  { x: 2, y: 3 }, { x: 11, y: 6 }, { x: 5, y: 11 }, { x: 13, y: 13 },
+]
+const GRASS_HIGHLIGHTS: readonly PixelPoint[] = [
+  { x: 2, y: 7 }, { x: 11, y: 13 },
+]
+const GRASS_ALT_HIGHLIGHTS: readonly PixelPoint[] = [
+  { x: 7, y: 2 }, { x: 12, y: 10 },
+]
+
 function paintGrass(ctx: CanvasRenderingContext2D, alt: boolean) {
   ctx.fillStyle = alt ? SHADE.grassAlt : SHADE.grass
   ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE)
-  // Sprinkle a few darker pixels for texture (deterministic per-tile)
+  fillPoints(ctx, SHADE.bgDark, alt ? GRASS_ALT_TEXTURE_DOTS : GRASS_TEXTURE_DOTS)
+  fillPoints(ctx, SHADE.grassEdge, alt ? GRASS_ALT_HIGHLIGHTS : GRASS_HIGHLIGHTS)
+}
+
+const COBBLESTONE_RECTS: readonly PixelRect[] = [
+  { x: 1, y: 1, w: 4, h: 3 }, { x: 6, y: 1, w: 4, h: 3 }, { x: 11, y: 1, w: 4, h: 2 },
+  { x: 2, y: 5, w: 3, h: 3 }, { x: 7, y: 6, w: 4, h: 2 }, { x: 12, y: 5, w: 3, h: 4 },
+  { x: 1, y: 9, w: 4, h: 3 }, { x: 7, y: 10, w: 3, h: 3 }, { x: 11, y: 10, w: 4, h: 3 },
+  { x: 2, y: 13, w: 3, h: 2 }, { x: 7, y: 14, w: 4, h: 1 }, { x: 12, y: 13, w: 3, h: 2 },
+]
+const COBBLESTONE_CRACK_SPACING_PX = 5
+
+function paintCobblestones(ctx: CanvasRenderingContext2D) {
+  fillRects(ctx, SHADE.pathLight, COBBLESTONE_RECTS)
   ctx.fillStyle = SHADE.bgDark
-  const dots = alt
-    ? [
-        [2, 3], [11, 6], [5, 11], [13, 13],
-      ]
-    : [
-        [4, 2], [9, 5], [14, 9], [3, 12], [8, 14],
-      ]
-  for (const [x, y] of dots) ctx.fillRect(x, y, 1, 1)
-  // Lighter highlights
-  ctx.fillStyle = SHADE.grassEdge
-  const lights = alt ? [[7, 2], [12, 10]] : [[2, 7], [11, 13]]
-  for (const [x, y] of lights) ctx.fillRect(x, y, 1, 1)
+  for (let crackX = 0; crackX < TILE_SIZE; crackX += COBBLESTONE_CRACK_SPACING_PX) {
+    ctx.fillRect(crackX, 0, 1, TILE_SIZE)
+  }
 }
 
 function paintPath(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = SHADE.pathDark
   ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE)
-  ctx.fillStyle = SHADE.pathLight
-  // Cobblestone pattern
-  const stones = [
-    [1, 1, 4, 3], [6, 1, 4, 3], [11, 1, 4, 2],
-    [2, 5, 3, 3], [7, 6, 4, 2], [12, 5, 3, 4],
-    [1, 9, 4, 3], [7, 10, 3, 3], [11, 10, 4, 3],
-    [2, 13, 3, 2], [7, 14, 4, 1], [12, 13, 3, 2],
-  ]
-  for (const [x, y, w, h] of stones) ctx.fillRect(x, y, w, h)
-  ctx.fillStyle = SHADE.bgDark
-  // Cracks between stones
-  for (let i = 0; i < TILE_SIZE; i += 5) ctx.fillRect(i, 0, 1, TILE_SIZE)
+  paintCobblestones(ctx)
 }
 
 function paintWater(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = SHADE.waterDeep
   ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE)
   ctx.fillStyle = SHADE.water
-  // Wave bands
   ctx.fillRect(0, 3, TILE_SIZE, 2)
   ctx.fillRect(0, 9, TILE_SIZE, 2)
   ctx.fillStyle = PAL.secondary
-  // Highlights
   ctx.fillRect(2, 3, 4, 1)
   ctx.fillRect(9, 9, 4, 1)
   ctx.fillRect(11, 3, 3, 1)
@@ -67,10 +80,8 @@ function paintWater(ctx: CanvasRenderingContext2D) {
 
 function paintTree(ctx: CanvasRenderingContext2D) {
   paintGrass(ctx, false)
-  // Trunk
   ctx.fillStyle = SHADE.treeBark
   ctx.fillRect(7, 11, 2, 4)
-  // Foliage
   ctx.fillStyle = SHADE.treeLeaf
   ctx.fillRect(4, 3, 8, 8)
   ctx.fillRect(3, 5, 10, 5)
@@ -106,7 +117,6 @@ function paintFlower(ctx: CanvasRenderingContext2D) {
   ctx.fillRect(8, 8, 1, 1)
   ctx.fillStyle = SHADE.treeLeafLight
   ctx.fillRect(7, 9, 2, 2)
-  // small second flower
   ctx.fillStyle = SHADE.flowerPink
   ctx.fillRect(11, 11, 1, 1)
   ctx.fillStyle = SHADE.flowerYellow
@@ -136,23 +146,23 @@ const painters: Record<TileId, (ctx: CanvasRenderingContext2D) => void> = {
 }
 
 export function getTileCanvas(id: TileId): HTMLCanvasElement {
-  let cached = tileCache.get(id)
+  const cached = tileCache.get(id)
   if (cached) return cached
-  cached = makeCanvas()
-  const ctx = cached.getContext('2d')!
+  const canvas = makeCanvas()
+  const ctx = canvas.getContext('2d')!
   ctx.imageSmoothingEnabled = false
   painters[id](ctx)
-  tileCache.set(id, cached)
-  return cached
+  tileCache.set(id, canvas)
+  return canvas
 }
 
-// Variant grass for checkerboard texture — drawn from world.ts based on (x+y) parity.
-let altGrass: HTMLCanvasElement | null = null
+let altGrassCanvas: HTMLCanvasElement | null = null
+
 export function getAltGrassCanvas(): HTMLCanvasElement {
-  if (altGrass) return altGrass
-  altGrass = makeCanvas()
-  const ctx = altGrass.getContext('2d')!
+  if (altGrassCanvas) return altGrassCanvas
+  altGrassCanvas = makeCanvas()
+  const ctx = altGrassCanvas.getContext('2d')!
   ctx.imageSmoothingEnabled = false
   paintGrass(ctx, true)
-  return altGrass
+  return altGrassCanvas
 }

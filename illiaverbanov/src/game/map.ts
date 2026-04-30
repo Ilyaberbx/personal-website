@@ -1,16 +1,5 @@
 import type { StationId, StationSprite } from '../data/types'
 
-// Tile-based world map.
-//   .  grass (passable)
-//   -  path / cobble (passable)
-//   T  tree (blocks)
-//   ~  water (blocks)
-//   #  wall (blocks)
-//   f  flower (passable, decorative)
-//   l  lamp post (blocks, decorative)
-//
-// Stations & decorations are placed on top of this terrain via STATION_POSITIONS / PROPS.
-
 export const TILE = {
   Grass: 0,
   Path: 1,
@@ -23,15 +12,19 @@ export const TILE = {
 
 export type TileId = (typeof TILE)[keyof typeof TILE]
 
-const charToTile: Record<string, TileId> = {
-  '.': TILE.Grass,
-  '-': TILE.Path,
-  T: TILE.Tree,
-  '~': TILE.Water,
-  '#': TILE.Wall,
-  f: TILE.Flower,
-  l: TILE.Lamp,
+const TILE_CHARS: Record<TileId, string> = {
+  [TILE.Grass]: '.',
+  [TILE.Path]: '-',
+  [TILE.Tree]: 'T',
+  [TILE.Water]: '~',
+  [TILE.Wall]: '#',
+  [TILE.Flower]: 'f',
+  [TILE.Lamp]: 'l',
 }
+
+const charToTile: Record<string, TileId> = Object.fromEntries(
+  (Object.entries(TILE_CHARS) as [string, string][]).map(([id, char]) => [char, Number(id) as TileId]),
+)
 
 const rawMap = [
   'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',

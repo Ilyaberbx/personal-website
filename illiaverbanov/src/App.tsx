@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { IntroScreen } from './components/IntroScreen'
-import { World } from './components/World'
+import { IntroScreen } from './components/intro-screen'
+import { World } from './components/world'
 
 export default function App() {
   const [started, setStarted] = useState(false)

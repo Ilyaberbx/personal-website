@@ -1,14 +1,5 @@
 import { safeVibrate } from './safe-vibrate'
 
-// Unified input source. Three independent channels feed `getDir()`:
-//   - Keyboard (WASD / arrow keys)
-//   - D-pad (held button) on mobile
-//   - Joystick (drag-on-canvas) on mobile
-//
-// Multiple pointers (e.g. D-pad + action button + canvas drag with three
-// fingers) work simultaneously because each channel is its own slot and the
-// browser routes pointerevents per pointerId.
-
 export type Dir = 'up' | 'down' | 'left' | 'right' | null
 
 const keysDown = new Set<string>()
@@ -46,17 +37,18 @@ function onKeyUp(e: KeyboardEvent) {
   keysDown.delete(e.code)
 }
 
-let installed = false
+let isInputInstalled = false
+
 export function installInput() {
-  if (installed) return
-  installed = true
+  if (isInputInstalled) return
+  isInputInstalled = true
   window.addEventListener('keydown', onKeyDown)
   window.addEventListener('keyup', onKeyUp)
 }
 
 export function uninstallInput() {
-  if (!installed) return
-  installed = false
+  if (!isInputInstalled) return
+  isInputInstalled = false
   window.removeEventListener('keydown', onKeyDown)
   window.removeEventListener('keyup', onKeyUp)
   keysDown.clear()
@@ -64,11 +56,7 @@ export function uninstallInput() {
   joystickDir = null
 }
 
-// D-pad takes priority (deliberate user input) over joystick (drag) over
-// keyboard. Practically these don't co-occur, but the order is well-defined.
-export function getDir(): Dir {
-  if (dpadDir) return dpadDir
-  if (joystickDir) return joystickDir
+function readKeyboardDir(): Dir {
   if (keysDown.has('ArrowUp') || keysDown.has('KeyW')) return 'up'
   if (keysDown.has('ArrowDown') || keysDown.has('KeyS')) return 'down'
   if (keysDown.has('ArrowLeft') || keysDown.has('KeyA')) return 'left'
@@ -76,17 +64,18 @@ export function getDir(): Dir {
   return null
 }
 
-// ─────────── D-pad channel ───────────
+export function getDir(): Dir {
+  return dpadDir ?? joystickDir ?? readKeyboardDir()
+}
+
 export function setDpadDir(d: Dir) {
   dpadDir = d
 }
 
-// ─────────── Joystick channel (canvas drag) ───────────
 export function setJoystickDir(d: Dir) {
   joystickDir = d
 }
 
-// ─────────── Action / close fire-once events ───────────
 export function fireAction() {
   actionListeners.forEach((l) => l())
 }
@@ -106,6 +95,5 @@ export function onClose(fn: () => void): () => void {
 }
 
 export function vibrate(ms = 8) {
-  // Vibration is best-effort; failures are silent.
   safeVibrate(ms)
 }

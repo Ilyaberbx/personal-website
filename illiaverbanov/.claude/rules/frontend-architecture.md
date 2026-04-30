@@ -5,14 +5,16 @@ The web app follows a **smart hook + dumb component** pattern. A component file 
 ## Folder layout
 
 ```
-src/components/<ComponentName>/
-  <ComponentName>.tsx            ← dumb: imports the hook + styles, returns JSX
-  use-<component-name>.ts        ← smart: state, effects, handlers, derived values
-  <component-name>.styles.ts     ← styles (CSS-in-TS) or <component-name>.module.css
-  <component-name>.types.ts      ← (optional) local types/interfaces
-  <component-name>.constants.ts  ← (optional) module-local constants
+src/components/<feature-name>/
+  <FeatureName>.tsx              ← dumb: imports the hook + styles, returns JSX
+  use-<feature-name>.ts          ← smart: state, effects, handlers, derived values
+  <feature-name>.module.css      ← styles (or <feature-name>.styles.ts for prop-dependent styles)
+  <feature-name>.types.ts        ← (optional) local types/interfaces
+  <feature-name>.constants.ts    ← (optional) module-local constants
   index.ts                       ← public re-export
 ```
+
+See `folder-structure.md` for the casing and folder rules.
 
 ## Rules
 
@@ -21,13 +23,10 @@ src/components/<ComponentName>/
 3. **Styles live next to the component.** Use either `<feature>.module.css` (preferred for static styling) or `<feature>.styles.ts` (when styles depend on props/state). The component imports styles; the hook does not.
 4. **Types live in `<feature>.types.ts`.** Interfaces, prop types, and union types used by the screen/hook/styles go here; don't declare them inline.
 5. **Constants live in `<feature>.constants.ts`.** Any module-local constant (option lists, copy, thresholds) that isn't already a shared token.
-6. **File naming is `kebab-case`** for non-component files; `PascalCase.tsx` for the component file.
-7. **Scope: feature components.** Trivial leaf components under `src/components/shared/` (a `<Spacer>`, `<Icon>`, `<Pixel>`) are intentionally single-file.
-8. **The hook must not import JSX or styles.** Keep it free of React DOM imports so it stays unit-testable in isolation.
-9. **No "folder for folder" nesting.** A feature module with a single component must not wrap it in `components/<ComponentName>/` — the smart-hook bundle (component, hook, styles, types, constants, `index.ts`) lives directly under `src/components/<ComponentName>/`. Add a `components/` subfolder only when the feature has two or more sibling components, and even then group their files flat (`components/Foo.tsx`, `components/use-foo.ts`, …) rather than introducing per-component subfolders.
+6. **Naming and folder layout follow `folder-structure.md`** — kebab-case folders, `PascalCase.tsx` for component files, sibling sub-components flat next to the parent, leaf components in `shared/` only when reused by ≥2 features.
+7. **The hook must not import JSX or styles.** Keep it free of React DOM imports so it stays unit-testable in isolation.
 
 ## Carve-outs
 
-- **`src/game/` is exempt.** The canvas engine (`engine.ts`, `renderer.ts`, `world.ts`, `sprites.ts`, `tiles.ts`, `palette.ts`, `player.ts`, `input.ts`) is imperative game code, not React. Module-level functions and shared mutable state are fine there.
-- **Existing components** (`StationModal.tsx`, `World.tsx`, `IntroScreen.tsx`, etc.) currently live flat under `src/components/`. The colocation rule applies to **new components and rewrites** — don't sweep-migrate without an asked reason.
-- **`src/hooks/`** holds cross-feature hooks (`useGameState.ts`). Feature-local hooks (`use-station-modal.ts`) belong colocated with their component, not in `src/hooks/`.
+- **`src/game/` is exempt.** The canvas engine is imperative game code, not React. Module-level functions and shared mutable state are fine there.
+- **`src/hooks/`** holds cross-feature hooks (e.g. `use-game-state.ts`). Feature-local hooks (`use-station-modal.ts`) belong colocated with their component, not in `src/hooks/`.

@@ -6,14 +6,11 @@ import { getDir, installInput, onAction, onClose, uninstallInput } from './input
 import { TILE_SIZE } from './tiles'
 import { MAP_HEIGHT, MAP_WIDTH, NPC_POSITION, STATION_IDS, STATION_POSITIONS } from './map'
 
-// Logical render resolution (independent of CSS pixel size).
-// Smaller = bigger pixels (more zoomed in). 320x180 gives ~20x11 tiles visible
-// — comfortable on desktop, scales down nicely on phones.
 export const VIEW_W = 320
 export const VIEW_H = 180
 
-const MAX_FRAME_DT = 1 / 30 // clamp huge gaps
-const STATION_FOOTPRINT_TILE_OFFSET = 1 // sprite head occupies the tile above the footprint
+const MAX_FRAME_SECONDS = 1 / 30
+const STATION_HEAD_TILE_OFFSET = 1
 
 export type EngineState = {
   ready: boolean
@@ -51,15 +48,7 @@ export class Engine {
     this.state = { ...this.state, ready: true }
     this.notify()
     this.lastTime = performance.now()
-    const loop = (t: number) => {
-      const dtRaw = (t - this.lastTime) / 1000
-      const dt = Math.min(dtRaw, MAX_FRAME_DT)
-      this.lastTime = t
-      this.tick(dt)
-      this.draw()
-      this.rafId = requestAnimationFrame(loop)
-    }
-    this.rafId = requestAnimationFrame(loop)
+    this.rafId = requestAnimationFrame(this.tickFrame)
   }
 
   detach() {
@@ -87,8 +76,17 @@ export class Engine {
     this.notify()
   }
 
+  private tickFrame = (now: number) => {
+    const frameDeltaSeconds = (now - this.lastTime) / 1000
+    const clampedDeltaSeconds = Math.min(frameDeltaSeconds, MAX_FRAME_SECONDS)
+    this.lastTime = now
+    this.tick(clampedDeltaSeconds)
+    this.draw()
+    this.rafId = requestAnimationFrame(this.tickFrame)
+  }
+
   private tick(dt: number) {
-    if (this.state.modal) return // freeze world while reading
+    if (this.state.modal) return
     const dir = getDir()
     updatePlayer(this.player, dt, dir)
     const focus = findFocus(this.player)
@@ -99,11 +97,11 @@ export class Engine {
 
   private draw() {
     if (!this.ctx) return
-    const cam = computeCamera(this.player, VIEW_W, VIEW_H)
+    const camera = computeCamera(this.player, VIEW_W, VIEW_H)
     const highlightStationId =
       this.state.focus?.kind === 'station' ? this.state.focus.id : null
     const npcFocused = this.state.focus?.kind === 'npc'
-    renderWorld(this.ctx, this.player, cam, highlightStationId, npcFocused)
+    renderWorld(this.ctx, this.player, camera, highlightStationId, npcFocused)
   }
 
   private handleAction() {
@@ -122,22 +120,19 @@ export class Engine {
     this.handleClose()
   }
 
-  // Convert canvas-logical coordinates (0..VIEW_W, 0..VIEW_H) into a world tile.
   private viewToTile(viewX: number, viewY: number) {
-    const cam = computeCamera(this.player, VIEW_W, VIEW_H)
-    const wx = cam.x + viewX
-    const wy = cam.y + viewY
-    return { tx: Math.floor(wx / TILE_SIZE), ty: Math.floor(wy / TILE_SIZE) }
+    const camera = computeCamera(this.player, VIEW_W, VIEW_H)
+    const worldX = camera.x + viewX
+    const worldY = camera.y + viewY
+    return { tx: Math.floor(worldX / TILE_SIZE), ty: Math.floor(worldY / TILE_SIZE) }
   }
 
-  // Resolve a tap on the canvas. Stations are 32x32 sprites occupying the
-  // station tile and the tile directly above (visual head). NPC is 16x16.
   pickAt(viewX: number, viewY: number): { kind: 'station'; id: StationId } | { kind: 'npc' } | null {
     const { tx, ty } = this.viewToTile(viewX, viewY)
     for (const id of STATION_IDS) {
       const pos = STATION_POSITIONS[id]
       const isStationFootprint = pos.x === tx && pos.y === ty
-      const isStationHead = pos.x === tx && pos.y - STATION_FOOTPRINT_TILE_OFFSET === ty
+      const isStationHead = pos.x === tx && pos.y - STATION_HEAD_TILE_OFFSET === ty
       if (isStationFootprint || isStationHead) return { kind: 'station', id }
     }
     const isNpcTile = NPC_POSITION.x === tx && NPC_POSITION.y === ty
@@ -145,7 +140,6 @@ export class Engine {
     return null
   }
 
-  // Open a modal directly from a tap, regardless of player position.
   tapInteract(viewX: number, viewY: number): boolean {
     if (this.state.modal) return false
     const hit = this.pickAt(viewX, viewY)
