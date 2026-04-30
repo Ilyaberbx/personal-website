@@ -1,0 +1,100 @@
+import type { ReactNode } from 'react'
+import { PixelWindow } from './PixelWindow'
+
+type Props = {
+  title: string
+  onClose: () => void
+  children: ReactNode
+}
+
+export function StationModal({ title, onClose, children }: Props) {
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-stop" onClick={(e) => e.stopPropagation()}>
+        <PixelWindow title={title} onClose={onClose} width={720}>
+          <div className="modal-body">{children}</div>
+        </PixelWindow>
+      </div>
+      <style>{`
+        .modal-backdrop {
+          position: fixed;
+          inset: 0;
+          height: 100dvh;
+          background: rgba(14, 10, 29, 0.78);
+          z-index: 100;
+          display: grid;
+          place-items: center;
+          padding: 14px 8px;
+          animation: fade 120ms steps(2) both;
+        }
+        @keyframes fade {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .modal-stop {
+          max-height: calc(100dvh - 28px);
+          overflow: hidden;
+          display: flex;
+          width: 100%;
+          justify-content: center;
+        }
+        .modal-body {
+          font-family: var(--font-body);
+          font-size: 17px;
+          line-height: 1.45;
+          color: var(--c-text);
+          max-height: calc(100dvh - 110px);
+          overflow-y: auto;
+          padding-right: 4px;
+        }
+        @media (min-width: 640px) {
+          .modal-backdrop { padding: 28px 16px; }
+          .modal-stop { max-height: calc(100dvh - 56px); }
+          .modal-body { font-size: 19px; max-height: calc(100dvh - 140px); }
+        }
+        .modal-body h3 {
+          font-family: var(--font-display);
+          font-size: 11px;
+          letter-spacing: 1px;
+          color: var(--c-primary);
+          margin: 18px 0 10px;
+          text-transform: uppercase;
+        }
+        .modal-body h4 {
+          font-family: var(--font-display);
+          font-size: 10px;
+          letter-spacing: 1px;
+          color: var(--c-secondary);
+          margin: 0 0 6px;
+        }
+        .modal-body p {
+          margin: 0 0 10px;
+        }
+        .modal-body ul {
+          padding-left: 0;
+          list-style: none;
+          margin: 6px 0;
+        }
+        .modal-body li {
+          padding: 2px 0 2px 18px;
+          position: relative;
+        }
+        .modal-body li::before {
+          content: '▸';
+          position: absolute;
+          left: 0;
+          color: var(--c-primary);
+          font-size: 18px;
+        }
+        .modal-body a {
+          color: var(--c-primary);
+          border-bottom: 2px dotted var(--c-primary);
+        }
+        .modal-body a:hover {
+          color: var(--c-text);
+          background: var(--c-primary-dark);
+        }
+      `}</style>
+    </div>
+  )
+}
