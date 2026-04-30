@@ -1,0 +1,74 @@
+export type StationId = 'about' | 'skills' | 'experience' | 'trophies' | 'contact'
+
+export type StationSprite = 'tavern' | 'armory' | 'quest-board' | 'trophy-hall' | 'mailbox'
+
+export type PanelKey = StationId
+
+export type StationContent = {
+  id: StationId
+  label: string
+  hint: string
+  modalTitle: string
+  panel: PanelKey
+}
+
+export type Language = { name: string; level: string }
+
+export type Education = { school: string; degree: string; period: string }
+
+export type ProfileLinks = {
+  linkedin: string
+  telegram: string
+  github: string
+}
+
+export type Profile = {
+  name: string
+  title: string
+  location: string
+  email: string
+  phone: string
+  links: ProfileLinks
+  summary: string
+  level: number
+  xpYears: number
+}
+
+export type SkillItem = { name: string; level: number }
+
+export type SkillGroup = {
+  category: string
+  items: SkillItem[]
+}
+
+export type Experience = {
+  role: string
+  company: string
+  location: string
+  period: string
+  summary: string
+  bullets: string[]
+  stack: string[]
+}
+
+export type Trophy = {
+  title: string
+  metric: string
+  context: string
+}
+
+export type NpcContent = {
+  id: 'wandering-bard'
+  name: string
+  hint: string
+  lines: string[]
+}
+
+export type ContactItem = {
+  label: string
+  value: string
+  href: string
+  icon: string
+}
+
+export type ControlLegendItem = { key: string; label: string }

@@ -1,0 +1,1 @@
+export { NpcModal } from './NpcModal'

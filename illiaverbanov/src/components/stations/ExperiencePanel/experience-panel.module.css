@@ -1,0 +1,84 @@
+.list { display: flex; flex-direction: column; gap: 8px; }
+
+.quest {
+  background: rgba(22, 19, 42, 0.55);
+  border: 3px solid var(--c-primary-dark);
+}
+
+.questOpen { border-color: var(--c-primary); }
+
+.header {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    "chev role period"
+    "chev co   co";
+  gap: 2px 10px;
+  padding: 8px 10px;
+  text-align: left;
+  color: var(--c-text);
+  align-items: center;
+}
+
+.chev { grid-area: chev; color: var(--c-primary); font-size: 14px; }
+
+.role {
+  grid-area: role;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.co {
+  grid-area: co;
+  color: var(--c-secondary);
+  font-size: 17px;
+}
+
+.period {
+  grid-area: period;
+  font-family: var(--font-display);
+  font-size: 9px;
+  color: var(--c-secondary);
+  letter-spacing: 1px;
+  text-align: right;
+}
+
+@media (max-width: 540px) {
+  .header {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "chev role"
+      "chev co"
+      "chev period";
+  }
+  .period { text-align: left; }
+}
+
+.body {
+  padding: 4px 14px 14px 14px;
+  border-top: 2px dashed var(--c-primary-dark);
+}
+
+.summary {
+  color: var(--c-border);
+  margin: 8px 0 6px;
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.tag {
+  font-family: var(--font-display);
+  font-size: 8px;
+  letter-spacing: 1px;
+  padding: 4px 6px;
+  background: var(--c-bg-dark);
+  border: 2px solid var(--c-secondary);
+  color: var(--c-text);
+}

@@ -1,15 +1,19 @@
+import type { StationId } from '../data/types'
 import { createPlayer, updatePlayer, type PlayerState } from './player'
 import { computeCamera, renderWorld } from './renderer'
-import { findFocus, type WorldFocus } from './world'
+import { findFocus, isSameFocus, type WorldFocus } from './world'
 import { getDir, installInput, onAction, onClose, uninstallInput } from './input'
 import { TILE_SIZE } from './tiles'
-import { MAP_HEIGHT, MAP_WIDTH, NPC, STATIONS, type StationId } from '../data/map'
+import { MAP_HEIGHT, MAP_WIDTH, NPC_POSITION, STATION_IDS, STATION_POSITIONS } from './map'
 
 // Logical render resolution (independent of CSS pixel size).
 // Smaller = bigger pixels (more zoomed in). 320x180 gives ~20x11 tiles visible
 // — comfortable on desktop, scales down nicely on phones.
 export const VIEW_W = 320
 export const VIEW_H = 180
+
+const MAX_FRAME_DT = 1 / 30 // clamp huge gaps
+const STATION_FOOTPRINT_TILE_OFFSET = 1 // sprite head occupies the tile above the footprint
 
 export type EngineState = {
   ready: boolean
@@ -37,7 +41,8 @@ export class Engine {
   attach(canvas: HTMLCanvasElement) {
     canvas.width = VIEW_W
     canvas.height = VIEW_H
-    const ctx = canvas.getContext('2d')!
+    const ctx = canvas.getContext('2d')
+    if (!ctx) throw new Error('unreachable: canvas 2d context guaranteed by mount')
     ctx.imageSmoothingEnabled = false
     this.ctx = ctx
     installInput()
@@ -48,7 +53,7 @@ export class Engine {
     this.lastTime = performance.now()
     const loop = (t: number) => {
       const dtRaw = (t - this.lastTime) / 1000
-      const dt = Math.min(dtRaw, 1 / 30) // clamp huge gaps
+      const dt = Math.min(dtRaw, MAX_FRAME_DT)
       this.lastTime = t
       this.tick(dt)
       this.draw()
@@ -87,24 +92,18 @@ export class Engine {
     const dir = getDir()
     updatePlayer(this.player, dt, dir)
     const focus = findFocus(this.player)
-    const prev = this.state.focus
-    const same =
-      (prev?.kind === 'station' && focus?.kind === 'station' && prev.id === focus.id) ||
-      (prev?.kind === 'npc' && focus?.kind === 'npc') ||
-      (prev === null && focus === null)
-    if (!same) this.setState({ focus })
+    const focusUnchanged = isSameFocus(this.state.focus, focus)
+    if (focusUnchanged) return
+    this.setState({ focus })
   }
 
   private draw() {
     if (!this.ctx) return
     const cam = computeCamera(this.player, VIEW_W, VIEW_H)
-    renderWorld(
-      this.ctx,
-      this.player,
-      cam,
-      this.state.focus?.kind === 'station' ? this.state.focus.id : null,
-      this.state.focus?.kind === 'npc',
-    )
+    const highlightStationId =
+      this.state.focus?.kind === 'station' ? this.state.focus.id : null
+    const npcFocused = this.state.focus?.kind === 'npc'
+    renderWorld(this.ctx, this.player, cam, highlightStationId, npcFocused)
   }
 
   private handleAction() {
@@ -135,12 +134,14 @@ export class Engine {
   // station tile and the tile directly above (visual head). NPC is 16x16.
   pickAt(viewX: number, viewY: number): { kind: 'station'; id: StationId } | { kind: 'npc' } | null {
     const { tx, ty } = this.viewToTile(viewX, viewY)
-    for (const s of STATIONS) {
-      if (s.x === tx && (s.y === ty || s.y - 1 === ty)) {
-        return { kind: 'station', id: s.id }
-      }
+    for (const id of STATION_IDS) {
+      const pos = STATION_POSITIONS[id]
+      const isStationFootprint = pos.x === tx && pos.y === ty
+      const isStationHead = pos.x === tx && pos.y - STATION_FOOTPRINT_TILE_OFFSET === ty
+      if (isStationFootprint || isStationHead) return { kind: 'station', id }
     }
-    if (NPC.x === tx && NPC.y === ty) return { kind: 'npc' }
+    const isNpcTile = NPC_POSITION.x === tx && NPC_POSITION.y === ty
+    if (isNpcTile) return { kind: 'npc' }
     return null
   }
 

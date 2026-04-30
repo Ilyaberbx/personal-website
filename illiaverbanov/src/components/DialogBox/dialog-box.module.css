@@ -1,0 +1,60 @@
+.dialog {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  background: var(--c-bg-dark);
+  border: 3px solid var(--c-border);
+  box-shadow: 0 0 0 3px var(--c-bg), 0 6px 0 0 rgba(0, 0, 0, 0.4);
+  padding: 8px 14px 10px;
+  min-width: min(220px, 90%);
+  max-width: 92%;
+  z-index: 60;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--c-text);
+  animation: dialog-pop 90ms steps(2) both;
+  text-align: left;
+  pointer-events: none;
+}
+
+@keyframes dialog-pop {
+  from { transform: translate(-50%, 6px); opacity: 0; }
+  to   { transform: translate(-50%, 0);   opacity: 1; }
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--c-primary);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.hint {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--c-text);
+}
+
+.key {
+  font-family: var(--font-display);
+  font-size: 9px;
+  background: var(--c-primary-dark);
+  border: 2px solid var(--c-border);
+  padding: 3px 6px;
+  color: var(--c-text);
+}
+
+.titleNpc { color: var(--c-secondary); }
+
+@media (min-width: 640px) {
+  .dialog {
+    bottom: 22px;
+    padding: 10px 16px 12px;
+    font-size: 18px;
+  }
+  .title, .titleNpc { font-size: 10px; }
+}

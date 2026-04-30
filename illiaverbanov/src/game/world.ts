@@ -1,25 +1,37 @@
-import { STATIONS, NPC, type StationId, type Station } from '../data/map'
+import type { StationId } from '../data/types'
+import { STATION_IDS, STATION_POSITIONS, NPC_POSITION } from './map'
 import { getPlayerTile, type PlayerState } from './player'
 
 export type WorldFocus =
-  | { kind: 'station'; id: StationId; station: Station }
+  | { kind: 'station'; id: StationId }
   | { kind: 'npc' }
   | null
 
+const ADJACENT_DISTANCE = 1
+
+function manhattanDistance(ax: number, ay: number, bx: number, by: number): number {
+  return Math.abs(ax - bx) + Math.abs(ay - by)
+}
+
 export function findFocus(p: PlayerState): WorldFocus {
   const { tx, ty } = getPlayerTile(p)
-  // Station: adjacent (manhattan = 1) and player faces toward it
-  for (const s of STATIONS) {
-    const dx = s.x - tx
-    const dy = s.y - ty
-    const dist = Math.abs(dx) + Math.abs(dy)
-    if (dist <= 1) {
-      // any of 4 cardinal neighbors
-      return { kind: 'station', id: s.id, station: s }
-    }
+
+  for (const id of STATION_IDS) {
+    const pos = STATION_POSITIONS[id]
+    const isAdjacent = manhattanDistance(pos.x, pos.y, tx, ty) <= ADJACENT_DISTANCE
+    if (isAdjacent) return { kind: 'station', id }
   }
-  const ndx = NPC.x - tx
-  const ndy = NPC.y - ty
-  if (Math.abs(ndx) + Math.abs(ndy) <= 1) return { kind: 'npc' }
+
+  const isNpcAdjacent = manhattanDistance(NPC_POSITION.x, NPC_POSITION.y, tx, ty) <= ADJACENT_DISTANCE
+  if (isNpcAdjacent) return { kind: 'npc' }
+
   return null
+}
+
+export function isSameFocus(a: WorldFocus, b: WorldFocus): boolean {
+  if (a === null && b === null) return true
+  if (a === null || b === null) return false
+  if (a.kind !== b.kind) return false
+  if (a.kind === 'station' && b.kind === 'station') return a.id === b.id
+  return true
 }

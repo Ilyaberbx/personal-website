@@ -1,3 +1,5 @@
+import { safeVibrate } from './safe-vibrate'
+
 // Unified input source. Three independent channels feed `getDir()`:
 //   - Keyboard (WASD / arrow keys)
 //   - D-pad (held button) on mobile
@@ -34,15 +36,9 @@ function onKeyDown(e: KeyboardEvent) {
   const intent = KEY_MAP[e.code]
   if (!intent) return
   e.preventDefault()
-  if (intent === 'action') {
-    if (!keysDown.has(e.code)) {
-      actionListeners.forEach((l) => l())
-    }
-  } else if (intent === 'close') {
-    if (!keysDown.has(e.code)) {
-      closeListeners.forEach((l) => l())
-    }
-  }
+  const isFirstPress = !keysDown.has(e.code)
+  if (intent === 'action' && isFirstPress) actionListeners.forEach((l) => l())
+  else if (intent === 'close' && isFirstPress) closeListeners.forEach((l) => l())
   keysDown.add(e.code)
 }
 
@@ -110,11 +106,6 @@ export function onClose(fn: () => void): () => void {
 }
 
 export function vibrate(ms = 8) {
-  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-    try {
-      navigator.vibrate(ms)
-    } catch {
-      // ignore
-    }
-  }
+  // Vibration is best-effort; failures are silent.
+  safeVibrate(ms)
 }

@@ -1,0 +1,1 @@
+export { TrophiesPanel } from './TrophiesPanel'

@@ -1,5 +1,5 @@
 import type { Facing } from './sprites'
-import { isBlocked, isPropBlocked, isStationBlocked, NPC, SPAWN } from '../data/map'
+import { isBlocked, isPropBlocked, isStationBlocked, NPC_POSITION, SPAWN } from './map'
 import { TILE_SIZE } from './tiles'
 
 const MOVE_SPEED = 90 // pixels per second
@@ -34,22 +34,33 @@ function tileAt(px: number, py: number) {
   }
 }
 
+function isOccupiedByNpc(tx: number, ty: number): boolean {
+  return NPC_POSITION.x === tx && NPC_POSITION.y === ty
+}
+
 function isTileWalkable(tx: number, ty: number): boolean {
   if (isBlocked(tx, ty)) return false
   if (isPropBlocked(tx, ty)) return false
   if (isStationBlocked(tx, ty)) return false
-  if (NPC.x === tx && NPC.y === ty) return false
+  if (isOccupiedByNpc(tx, ty)) return false
   return true
 }
 
-export function updatePlayer(p: PlayerState, dt: number, dir: 'up' | 'down' | 'left' | 'right' | null) {
+function bothWalkable(ax: number, ay: number, bx: number, by: number): boolean {
+  return isTileWalkable(ax, ay) && isTileWalkable(bx, by)
+}
+
+export function updatePlayer(
+  p: PlayerState,
+  dt: number,
+  dir: 'up' | 'down' | 'left' | 'right' | null,
+) {
   if (!dir) {
     p.moving = false
     p.moveAccum = 0
     p.walkFrame = 0
     return
   }
-  // Update facing immediately
   p.facing = dir
   p.moving = true
 
@@ -62,18 +73,14 @@ export function updatePlayer(p: PlayerState, dt: number, dir: 'up' | 'down' | 'l
   else if (dir === 'right') dx = step
 
   // Tile-aligned collision: try axis independently.
-  // We snap to tile grid for collision: target tile is current tile + direction
-  // when the player has moved at least half a tile from the previous tile center.
   if (dx !== 0) {
     const newPx = p.px + dx
-    // Check both top and bottom edges of sprite at the new x
     const leadingX = dx > 0 ? newPx + TILE_SIZE - 1 : newPx
     const tx = Math.floor(leadingX / TILE_SIZE)
     const tyTop = Math.floor((p.py + 2) / TILE_SIZE)
     const tyBot = Math.floor((p.py + TILE_SIZE - 1) / TILE_SIZE)
-    if (isTileWalkable(tx, tyTop) && isTileWalkable(tx, tyBot)) {
-      p.px = newPx
-    }
+    const canMoveX = bothWalkable(tx, tyTop, tx, tyBot)
+    if (canMoveX) p.px = newPx
   }
   if (dy !== 0) {
     const newPy = p.py + dy
@@ -81,15 +88,14 @@ export function updatePlayer(p: PlayerState, dt: number, dir: 'up' | 'down' | 'l
     const ty = Math.floor(leadingY / TILE_SIZE)
     const txL = Math.floor((p.px + 2) / TILE_SIZE)
     const txR = Math.floor((p.px + TILE_SIZE - 1) / TILE_SIZE)
-    if (isTileWalkable(txL, ty) && isTileWalkable(txR, ty)) {
-      p.py = newPy
-    }
+    const canMoveY = bothWalkable(txL, ty, txR, ty)
+    if (canMoveY) p.py = newPy
   }
 
-  // Animate walk cycle by accumulated distance
   p.moveAccum += step
   const tilesWalked = p.moveAccum / TILE_SIZE
-  p.walkFrame = Math.floor(tilesWalked / ANIM_FRAME_PER_TILE) % 2 === 0 ? 0 : 1
+  const isOddFrame = Math.floor(tilesWalked / ANIM_FRAME_PER_TILE) % 2 !== 0
+  p.walkFrame = isOddFrame ? 1 : 0
 }
 
 export function getPlayerTile(p: PlayerState) {

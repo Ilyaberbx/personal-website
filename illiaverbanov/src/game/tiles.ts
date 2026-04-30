@@ -1,7 +1,7 @@
 // Tile sprites — drawn directly to an offscreen canvas at startup, then
 // blitted into the world via drawImage. Each tile is 16x16 logical pixels.
 import { PAL, SHADE } from './palette'
-import { TILE, type TileId } from '../data/map'
+import { TILE, type TileId } from './map'
 
 export const TILE_SIZE = 16
 
