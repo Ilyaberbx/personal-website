@@ -1,4 +1,5 @@
 import { safeVibrate } from './safe-vibrate'
+import { ACTION_KEYS, CLOSE_KEYS } from './input-config'
 
 export type Dir = 'up' | 'down' | 'left' | 'right' | null
 
@@ -8,7 +9,9 @@ let joystickDir: Dir = null
 const actionListeners = new Set<() => void>()
 const closeListeners = new Set<() => void>()
 
-const KEY_MAP: Record<string, Dir | 'action' | 'close'> = {
+type DirKey = 'up' | 'down' | 'left' | 'right'
+
+const DIR_KEY_MAP: Record<string, DirKey> = {
   ArrowUp: 'up',
   ArrowDown: 'down',
   ArrowLeft: 'left',
@@ -17,19 +20,18 @@ const KEY_MAP: Record<string, Dir | 'action' | 'close'> = {
   KeyA: 'left',
   KeyS: 'down',
   KeyD: 'right',
-  KeyE: 'action',
-  Space: 'action',
-  Enter: 'action',
-  Escape: 'close',
 }
 
 function onKeyDown(e: KeyboardEvent) {
-  const intent = KEY_MAP[e.code]
-  if (!intent) return
+  const isDirKey = e.code in DIR_KEY_MAP
+  const isActionKey = ACTION_KEYS.has(e.code)
+  const isCloseKey = CLOSE_KEYS.has(e.code)
+  const isKnownKey = isDirKey || isActionKey || isCloseKey
+  if (!isKnownKey) return
   e.preventDefault()
   const isFirstPress = !keysDown.has(e.code)
-  if (intent === 'action' && isFirstPress) actionListeners.forEach((l) => l())
-  else if (intent === 'close' && isFirstPress) closeListeners.forEach((l) => l())
+  if (isActionKey && isFirstPress) actionListeners.forEach((l) => l())
+  else if (isCloseKey && isFirstPress) closeListeners.forEach((l) => l())
   keysDown.add(e.code)
 }
 

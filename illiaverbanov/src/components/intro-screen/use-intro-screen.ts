@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
-
-const META_KEYS = new Set<string>(['Tab', 'Shift', 'Control', 'Alt', 'Meta'])
+import { META_KEYS } from '../../game/input-config'
 
 export type IntroTarget = 'game' | 'plain'
 

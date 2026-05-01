@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { fireAction, setDpadDir, vibrate, type Dir } from '../../game/input'
 import { safeHasPointerCapture, safeSetPointerCapture } from '../../lib/safe-pointer'
-
-const DPAD_VIBRATION_MS = 6
-const ACTION_VIBRATION_MS = 10
+import { ACTION_VIBRATION_MS, DPAD_VIBRATION_MS } from '../../game/input-config'
 
 type DpadHandlers = {
   onPointerDown: (e: ReactPointerEvent<HTMLButtonElement>) => void

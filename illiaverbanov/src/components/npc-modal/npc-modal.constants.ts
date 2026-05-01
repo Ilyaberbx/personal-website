@@ -37,4 +37,3 @@ export const BARD_COLORS = {
 
 export const NPC_MODAL_WIDTH = 620
 
-export const ADVANCE_KEY_CODES = new Set<string>(['Space', 'Enter', 'KeyE'])

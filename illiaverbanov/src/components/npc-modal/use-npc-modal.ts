@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { profile, WANDERING_BARD } from '../../data'
-import { ADVANCE_KEY_CODES } from './npc-modal.constants'
+import { ADVANCE_KEYS } from '../../game/input-config'
 
 function isAdvanceKey(code: string): boolean {
-  return ADVANCE_KEY_CODES.has(code)
+  return ADVANCE_KEYS.has(code)
 }
 
 export function useNpcModal(onClose: () => void) {
