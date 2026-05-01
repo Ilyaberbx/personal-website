@@ -1,17 +1,16 @@
 import type { StationId } from '../data/types'
-import { STATIONS } from '../data/stations'
 import { createPlayer, updatePlayer, type PlayerState } from './player'
 import { computeCamera, renderWorld } from './renderer'
 import { findFocus, isSameFocus, type WorldFocus } from './world'
+import { interactableAt } from './interactable'
 import { Input } from './input'
 import { TILE_SIZE } from './tiles'
-import { MAP_HEIGHT, MAP_WIDTH, NPC_POSITION } from './map'
+import { MAP_HEIGHT, MAP_WIDTH } from './map'
 
 export const VIEW_W = 320
 export const VIEW_H = 180
 
 const MAX_FRAME_SECONDS = 1 / 30
-const STATION_HEAD_TILE_OFFSET = 1
 
 export type EngineState = {
   ready: boolean
@@ -130,16 +129,9 @@ export class Engine {
     return { tx: Math.floor(worldX / TILE_SIZE), ty: Math.floor(worldY / TILE_SIZE) }
   }
 
-  pickAt(viewX: number, viewY: number): { kind: 'station'; id: StationId } | { kind: 'npc' } | null {
-    const { tx, ty } = this.viewToTile(viewX, viewY)
-    for (const [id, station] of Object.entries(STATIONS) as [StationId, (typeof STATIONS)[StationId]][]) {
-      const isStationFootprint = station.x === tx && station.y === ty
-      const isStationHead = station.x === tx && station.y - STATION_HEAD_TILE_OFFSET === ty
-      if (isStationFootprint || isStationHead) return { kind: 'station', id }
-    }
-    const isNpcTile = NPC_POSITION.x === tx && NPC_POSITION.y === ty
-    if (isNpcTile) return { kind: 'npc' }
-    return null
+  pickAt(viewX: number, viewY: number): WorldFocus {
+    const tile = this.viewToTile(viewX, viewY)
+    return interactableAt(tile, 'exact')
   }
 
   tapInteract(viewX: number, viewY: number): boolean {

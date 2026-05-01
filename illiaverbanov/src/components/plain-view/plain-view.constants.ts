@@ -1,14 +1,14 @@
-import { AboutPanel } from '../stations/about-panel'
-import { ContactPanel } from '../stations/contact-panel'
-import { ExperiencePanel } from '../stations/experience-panel'
-import { SkillsPanel } from '../stations/skills-panel'
-import { TrophiesPanel } from '../stations/trophies-panel'
+import { AboutContent } from '../sections/about-content/AboutContent'
+import { ContactContent } from '../sections/contact-content/ContactContent'
+import { ExperienceContent } from '../sections/experience-content/ExperienceContent'
+import { SkillsContent } from '../sections/skills-content/SkillsContent'
+import { TrophiesContent } from '../sections/trophies-content/TrophiesContent'
 import type { SectionDescriptor } from './plain-view.types'
 
 export const SECTIONS: readonly SectionDescriptor[] = [
-  { id: 'about', title: 'About', Panel: AboutPanel },
-  { id: 'skills', title: 'Skills', Panel: SkillsPanel },
-  { id: 'experience', title: 'Experience', Panel: ExperiencePanel },
-  { id: 'trophies', title: 'Trophies', Panel: TrophiesPanel },
-  { id: 'contact', title: 'Contact', Panel: ContactPanel },
+  { id: 'about', title: 'About', Panel: AboutContent },
+  { id: 'skills', title: 'Skills', Panel: SkillsContent },
+  { id: 'experience', title: 'Experience', Panel: ExperienceContent },
+  { id: 'trophies', title: 'Trophies', Panel: TrophiesContent },
+  { id: 'contact', title: 'Contact', Panel: ContactContent },
 ]
