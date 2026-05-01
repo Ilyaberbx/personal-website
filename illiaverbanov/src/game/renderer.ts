@@ -1,10 +1,9 @@
 import type { StationId } from '../data/types'
+import { STATIONS } from '../data/stations'
 import {
   MAP_WIDTH,
   MAP_HEIGHT,
   TILES,
-  STATION_IDS,
-  STATION_POSITIONS,
   PROPS,
   NPC_POSITION,
   TILE,
@@ -98,20 +97,17 @@ function buildStationDrawables(
   camera: Camera,
   highlightStationId: StationId | null,
 ): Drawable[] {
-  return STATION_IDS.map((id) => {
-    const pos = STATION_POSITIONS[id]
-    return {
-      y: pos.y * TILE_SIZE,
-      draw: () => {
-        const sprite = getStationSprite(pos.sprite)
-        const dx = pos.x * TILE_SIZE - camera.x + STATION_SPRITE_X_OFFSET
-        const dy = pos.y * TILE_SIZE - camera.y + STATION_SPRITE_Y_OFFSET
-        ctx.drawImage(sprite, dx, dy)
-        const isHighlighted = highlightStationId === id
-        if (isHighlighted) drawHighlight(ctx, dx + STATION_HIGHLIGHT_X, dy + STATION_HIGHLIGHT_Y)
-      },
-    }
-  })
+  return (Object.entries(STATIONS) as [StationId, (typeof STATIONS)[StationId]][]).map(([id, station]) => ({
+    y: station.y * TILE_SIZE,
+    draw: () => {
+      const sprite = getStationSprite(station.sprite)
+      const dx = station.x * TILE_SIZE - camera.x + STATION_SPRITE_X_OFFSET
+      const dy = station.y * TILE_SIZE - camera.y + STATION_SPRITE_Y_OFFSET
+      ctx.drawImage(sprite, dx, dy)
+      const isHighlighted = highlightStationId === id
+      if (isHighlighted) drawHighlight(ctx, dx + STATION_HIGHLIGHT_X, dy + STATION_HIGHLIGHT_Y)
+    },
+  }))
 }
 
 function buildNpcDrawable(

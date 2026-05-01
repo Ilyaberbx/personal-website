@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import { UI_COPY } from '../../data'
+import type { Engine } from '../../game/engine'
 import type { Dir } from '../../game/input'
 import { useTouchPad } from './use-touch-pad'
 import styles from './touch-pad.module.css'
@@ -20,8 +21,12 @@ const DIR_SPECS: readonly DirSpec[] = [
 
 const DPAD_MID_STYLE: CSSProperties = { gridArea: 'mid' }
 
-export function TouchPad() {
-  const { show, buildDpadHandlers, handleAction } = useTouchPad()
+type Props = {
+  engine: Engine
+}
+
+export function TouchPad({ engine }: Props) {
+  const { show, buildDpadHandlers, handleAction } = useTouchPad(engine)
   if (!show) return null
 
   return (

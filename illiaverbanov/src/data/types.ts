@@ -1,16 +1,6 @@
-export type StationId = 'about' | 'skills' | 'experience' | 'trophies' | 'contact'
+import type { STATIONS } from './stations'
 
-export type StationSprite = 'tavern' | 'armory' | 'quest-board' | 'trophy-hall' | 'mailbox'
-
-export type PanelKey = StationId
-
-export type StationContent = {
-  id: StationId
-  label: string
-  hint: string
-  modalTitle: string
-  panel: PanelKey
-}
+export type StationId = keyof typeof STATIONS
 
 export type Language = { name: string; level: string }
 

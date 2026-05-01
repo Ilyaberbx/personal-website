@@ -1,11 +1,10 @@
 import type { StationId } from '../data/types'
+import { STATIONS } from '../data/stations'
 import type { Prop } from './map'
 import {
   TILES,
   TILE,
   PROPS,
-  STATION_IDS,
-  STATION_POSITIONS,
   NPC_POSITION,
   isBlocked,
 } from './map'
@@ -18,11 +17,10 @@ export type Occupant =
   | { kind: 'npc' }
 
 function findStationOccupant(x: number, y: number): Extract<Occupant, { kind: 'station' }> | null {
-  for (const id of STATION_IDS) {
-    const pos = STATION_POSITIONS[id]
-    const isHeadTile = pos.x === x && pos.y === y
+  for (const [id, station] of Object.entries(STATIONS) as [StationId, (typeof STATIONS)[StationId]][]) {
+    const isHeadTile = station.x === x && station.y === y
     if (isHeadTile) return { kind: 'station', id, role: 'head' }
-    const isFootprintTile = pos.x === x && pos.y + 1 === y
+    const isFootprintTile = station.x === x && station.y + 1 === y
     if (isFootprintTile) return { kind: 'station', id, role: 'footprint' }
   }
   return null

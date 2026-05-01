@@ -1,5 +1,6 @@
 import type { StationId } from '../data/types'
-import { STATION_IDS, STATION_POSITIONS, NPC_POSITION } from './map'
+import { STATIONS } from '../data/stations'
+import { NPC_POSITION } from './map'
 import { getPlayerTile, type PlayerState } from './player'
 
 export type WorldFocus =
@@ -16,9 +17,8 @@ function manhattanDistance(ax: number, ay: number, bx: number, by: number): numb
 export function findFocus(p: PlayerState): WorldFocus {
   const { tx, ty } = getPlayerTile(p)
 
-  for (const id of STATION_IDS) {
-    const pos = STATION_POSITIONS[id]
-    const isAdjacent = manhattanDistance(pos.x, pos.y, tx, ty) <= ADJACENT_DISTANCE
+  for (const [id, station] of Object.entries(STATIONS) as [StationId, (typeof STATIONS)[StationId]][]) {
+    const isAdjacent = manhattanDistance(station.x, station.y, tx, ty) <= ADJACENT_DISTANCE
     if (isAdjacent) return { kind: 'station', id }
   }
 

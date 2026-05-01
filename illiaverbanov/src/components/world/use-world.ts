@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { Engine, VIEW_H, VIEW_W } from '../../game/engine'
-import { setJoystickDir, vibrate, type Dir } from '../../game/input'
+import type { Dir } from '../../game/input'
 import { useGameState } from '../../hooks/use-game-state'
 import { safeSetPointerCapture } from '../../lib/safe-pointer'
 import {
@@ -74,7 +74,7 @@ export function useWorld() {
     if (isBelowDragThreshold) return
 
     info.dragging = true
-    setJoystickDir(dirFromDelta(dx, dy))
+    engine.input.setJoystickDir(dirFromDelta(dx, dy))
   }
 
   const finishPointer = (e: ReactPointerEvent<HTMLCanvasElement>) => {
@@ -85,7 +85,7 @@ export function useWorld() {
     if (info.dragging) {
       let othersDragging = false
       for (const v of pointersRef.current.values()) if (v.dragging) othersDragging = true
-      if (!othersDragging) setJoystickDir(null)
+      if (!othersDragging) engine.input.setJoystickDir(null)
       return
     }
 
@@ -103,18 +103,19 @@ export function useWorld() {
     const viewX = ((e.clientX - rect.left) / rect.width) * VIEW_W
     const viewY = ((e.clientY - rect.top) / rect.height) * VIEW_H
     const opened = engine.tapInteract(viewX, viewY)
-    if (opened) vibrate(TAP_INTERACT_VIBRATION_MS)
+    if (opened) engine.input.vibrate(TAP_INTERACT_VIBRATION_MS)
   }
 
   const handlePointerCancel = (e: ReactPointerEvent<HTMLCanvasElement>) => {
     const info = pointersRef.current.get(e.pointerId)
-    if (info?.dragging) setJoystickDir(null)
+    if (info?.dragging) engine.input.setJoystickDir(null)
     pointersRef.current.delete(e.pointerId)
   }
 
   const closeModal = () => engine.closeModal()
 
   return {
+    engine,
     canvasRef,
     modal,
     focus,

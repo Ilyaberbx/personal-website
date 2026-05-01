@@ -1,10 +1,11 @@
 import type { StationId } from '../data/types'
+import { STATIONS } from '../data/stations'
 import { createPlayer, updatePlayer, type PlayerState } from './player'
 import { computeCamera, renderWorld } from './renderer'
 import { findFocus, isSameFocus, type WorldFocus } from './world'
-import { getDir, installInput, onAction, onClose, uninstallInput } from './input'
+import { Input } from './input'
 import { TILE_SIZE } from './tiles'
-import { MAP_HEIGHT, MAP_WIDTH, NPC_POSITION, STATION_IDS, STATION_POSITIONS } from './map'
+import { MAP_HEIGHT, MAP_WIDTH, NPC_POSITION } from './map'
 
 export const VIEW_W = 320
 export const VIEW_H = 180
@@ -23,6 +24,7 @@ type Listener = () => void
 export class Engine {
   player: PlayerState
   state: EngineState
+  input: Input
   private ctx: CanvasRenderingContext2D | null = null
   private rafId = 0
   private lastTime = 0
@@ -33,6 +35,7 @@ export class Engine {
   constructor() {
     this.player = createPlayer()
     this.state = { ready: false, modal: null, focus: null }
+    this.input = new Input()
   }
 
   attach(canvas: HTMLCanvasElement) {
@@ -42,9 +45,9 @@ export class Engine {
     if (!ctx) throw new Error('unreachable: canvas 2d context guaranteed by mount')
     ctx.imageSmoothingEnabled = false
     this.ctx = ctx
-    installInput()
-    this.offAction = onAction(() => this.handleAction())
-    this.offClose = onClose(() => this.handleClose())
+    this.input.install()
+    this.offAction = this.input.onAction(() => this.handleAction())
+    this.offClose = this.input.onClose(() => this.handleClose())
     this.state = { ...this.state, ready: true }
     this.notify()
     this.lastTime = performance.now()
@@ -56,7 +59,7 @@ export class Engine {
     this.rafId = 0
     this.offAction()
     this.offClose()
-    uninstallInput()
+    this.input.uninstall()
     this.ctx = null
   }
 
@@ -87,7 +90,7 @@ export class Engine {
 
   private tick(dt: number) {
     if (this.state.modal) return
-    const dir = getDir()
+    const dir = this.input.getDir()
     updatePlayer(this.player, dt, dir)
     const focus = findFocus(this.player)
     const focusUnchanged = isSameFocus(this.state.focus, focus)
@@ -129,10 +132,9 @@ export class Engine {
 
   pickAt(viewX: number, viewY: number): { kind: 'station'; id: StationId } | { kind: 'npc' } | null {
     const { tx, ty } = this.viewToTile(viewX, viewY)
-    for (const id of STATION_IDS) {
-      const pos = STATION_POSITIONS[id]
-      const isStationFootprint = pos.x === tx && pos.y === ty
-      const isStationHead = pos.x === tx && pos.y - STATION_HEAD_TILE_OFFSET === ty
+    for (const [id, station] of Object.entries(STATIONS) as [StationId, (typeof STATIONS)[StationId]][]) {
+      const isStationFootprint = station.x === tx && station.y === ty
+      const isStationHead = station.x === tx && station.y - STATION_HEAD_TILE_OFFSET === ty
       if (isStationFootprint || isStationHead) return { kind: 'station', id }
     }
     const isNpcTile = NPC_POSITION.x === tx && NPC_POSITION.y === ty

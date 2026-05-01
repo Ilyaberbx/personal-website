@@ -1,43 +1,64 @@
-import type { StationContent, StationId } from './types'
+import type { ComponentType } from 'react'
+import { AboutPanel } from '../components/stations/about-panel'
+import { ContactPanel } from '../components/stations/contact-panel'
+import { ExperiencePanel } from '../components/stations/experience-panel'
+import { SkillsPanel } from '../components/stations/skills-panel'
+import { TrophiesPanel } from '../components/stations/trophies-panel'
 
-export const STATION_CONTENT: Record<StationId, StationContent> = {
+type StationEntry = {
+  x: number
+  y: number
+  sprite: 'tavern' | 'armory' | 'quest-board' | 'trophy-hall' | 'mailbox'
+  label: string
+  hint: string
+  modalTitle: string
+  Panel: ComponentType
+}
+
+export const STATIONS = {
   about: {
-    id: 'about',
+    x: 6,
+    y: 4,
+    sprite: 'tavern',
     label: 'The Tavern',
     hint: "Read the traveler's tale",
     modalTitle: 'The Tavern — About',
-    panel: 'about',
+    Panel: AboutPanel,
   },
   skills: {
-    id: 'skills',
+    x: 25,
+    y: 4,
+    sprite: 'armory',
     label: 'The Armory',
     hint: 'Inspect equipped skills',
     modalTitle: 'The Armory — Skills',
-    panel: 'skills',
+    Panel: SkillsPanel,
   },
   experience: {
-    id: 'experience',
+    x: 16,
+    y: 2,
+    sprite: 'quest-board',
     label: 'Quest Board',
     hint: 'Review completed quests',
     modalTitle: 'Quest Board — Experience',
-    panel: 'experience',
+    Panel: ExperiencePanel,
   },
   trophies: {
-    id: 'trophies',
+    x: 25,
+    y: 17,
+    sprite: 'trophy-hall',
     label: 'Trophy Hall',
     hint: 'Admire the trophies',
     modalTitle: 'Trophy Hall — Achievements',
-    panel: 'trophies',
+    Panel: TrophiesPanel,
   },
   contact: {
-    id: 'contact',
+    x: 6,
+    y: 17,
+    sprite: 'mailbox',
     label: 'The Mailbox',
     hint: 'Send a raven',
     modalTitle: 'The Mailbox — Contact',
-    panel: 'contact',
+    Panel: ContactPanel,
   },
-}
-
-export function getStationContent(id: StationId): StationContent {
-  return STATION_CONTENT[id]
-}
+} as const satisfies Record<string, StationEntry>

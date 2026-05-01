@@ -1,13 +1,7 @@
 import { safeVibrate } from './safe-vibrate'
-import { ACTION_KEYS, CLOSE_KEYS } from './input-config'
+import { ACTION_KEYS, CLOSE_KEYS, META_KEYS } from './input-config'
 
 export type Dir = 'up' | 'down' | 'left' | 'right' | null
-
-const keysDown = new Set<string>()
-let dpadDir: Dir = null
-let joystickDir: Dir = null
-const actionListeners = new Set<() => void>()
-const closeListeners = new Set<() => void>()
 
 type DirKey = 'up' | 'down' | 'left' | 'right'
 
@@ -22,80 +16,100 @@ const DIR_KEY_MAP: Record<string, DirKey> = {
   KeyD: 'right',
 }
 
-function onKeyDown(e: KeyboardEvent) {
-  const isDirKey = e.code in DIR_KEY_MAP
-  const isActionKey = ACTION_KEYS.has(e.code)
-  const isCloseKey = CLOSE_KEYS.has(e.code)
-  const isKnownKey = isDirKey || isActionKey || isCloseKey
-  if (!isKnownKey) return
-  e.preventDefault()
-  const isFirstPress = !keysDown.has(e.code)
-  if (isActionKey && isFirstPress) actionListeners.forEach((l) => l())
-  else if (isCloseKey && isFirstPress) closeListeners.forEach((l) => l())
-  keysDown.add(e.code)
-}
+export class Input {
+  private target: EventTarget
+  private keysDown = new Set<string>()
+  private dpadDir: Dir = null
+  private joystickDir: Dir = null
+  private actionListeners = new Set<() => void>()
+  private closeListeners = new Set<() => void>()
+  private installed = false
 
-function onKeyUp(e: KeyboardEvent) {
-  keysDown.delete(e.code)
-}
+  constructor(target: EventTarget = window) {
+    this.target = target
+    this.onKeyDown = this.onKeyDown.bind(this)
+    this.onKeyUp = this.onKeyUp.bind(this)
+  }
 
-let isInputInstalled = false
+  private onKeyDown(e: Event) {
+    const ke = e as KeyboardEvent
+    const isMetaModified = ke.metaKey
+    if (isMetaModified) return
 
-export function installInput() {
-  if (isInputInstalled) return
-  isInputInstalled = true
-  window.addEventListener('keydown', onKeyDown)
-  window.addEventListener('keyup', onKeyUp)
-}
+    const isDirKey = ke.code in DIR_KEY_MAP
+    const isActionKey = ACTION_KEYS.has(ke.code)
+    const isCloseKey = CLOSE_KEYS.has(ke.code)
+    const isMetaKey = META_KEYS.has(ke.code)
+    const isKnownKey = isDirKey || isActionKey || isCloseKey || isMetaKey
+    if (!isKnownKey) return
 
-export function uninstallInput() {
-  if (!isInputInstalled) return
-  isInputInstalled = false
-  window.removeEventListener('keydown', onKeyDown)
-  window.removeEventListener('keyup', onKeyUp)
-  keysDown.clear()
-  dpadDir = null
-  joystickDir = null
-}
+    e.preventDefault()
+    const isFirstPress = !this.keysDown.has(ke.code)
+    if (isActionKey && isFirstPress) this.actionListeners.forEach((l) => l())
+    else if (isCloseKey && isFirstPress) this.closeListeners.forEach((l) => l())
+    this.keysDown.add(ke.code)
+  }
 
-function readKeyboardDir(): Dir {
-  if (keysDown.has('ArrowUp') || keysDown.has('KeyW')) return 'up'
-  if (keysDown.has('ArrowDown') || keysDown.has('KeyS')) return 'down'
-  if (keysDown.has('ArrowLeft') || keysDown.has('KeyA')) return 'left'
-  if (keysDown.has('ArrowRight') || keysDown.has('KeyD')) return 'right'
-  return null
-}
+  private onKeyUp(e: Event) {
+    this.keysDown.delete((e as KeyboardEvent).code)
+  }
 
-export function getDir(): Dir {
-  return dpadDir ?? joystickDir ?? readKeyboardDir()
-}
+  install() {
+    if (this.installed) return
+    this.installed = true
+    this.target.addEventListener('keydown', this.onKeyDown)
+    this.target.addEventListener('keyup', this.onKeyUp)
+  }
 
-export function setDpadDir(d: Dir) {
-  dpadDir = d
-}
+  uninstall() {
+    if (!this.installed) return
+    this.installed = false
+    this.target.removeEventListener('keydown', this.onKeyDown)
+    this.target.removeEventListener('keyup', this.onKeyUp)
+    this.keysDown.clear()
+    this.dpadDir = null
+    this.joystickDir = null
+  }
 
-export function setJoystickDir(d: Dir) {
-  joystickDir = d
-}
+  private readKeyboardDir(): Dir {
+    if (this.keysDown.has('ArrowUp') || this.keysDown.has('KeyW')) return 'up'
+    if (this.keysDown.has('ArrowDown') || this.keysDown.has('KeyS')) return 'down'
+    if (this.keysDown.has('ArrowLeft') || this.keysDown.has('KeyA')) return 'left'
+    if (this.keysDown.has('ArrowRight') || this.keysDown.has('KeyD')) return 'right'
+    return null
+  }
 
-export function fireAction() {
-  actionListeners.forEach((l) => l())
-}
+  getDir(): Dir {
+    return this.dpadDir ?? this.joystickDir ?? this.readKeyboardDir()
+  }
 
-export function fireClose() {
-  closeListeners.forEach((l) => l())
-}
+  setDpadDir(d: Dir) {
+    this.dpadDir = d
+  }
 
-export function onAction(fn: () => void): () => void {
-  actionListeners.add(fn)
-  return () => actionListeners.delete(fn)
-}
+  setJoystickDir(d: Dir) {
+    this.joystickDir = d
+  }
 
-export function onClose(fn: () => void): () => void {
-  closeListeners.add(fn)
-  return () => closeListeners.delete(fn)
-}
+  fireAction() {
+    this.actionListeners.forEach((l) => l())
+  }
 
-export function vibrate(ms = 8) {
-  safeVibrate(ms)
+  fireClose() {
+    this.closeListeners.forEach((l) => l())
+  }
+
+  onAction(fn: () => void): () => void {
+    this.actionListeners.add(fn)
+    return () => this.actionListeners.delete(fn)
+  }
+
+  onClose(fn: () => void): () => void {
+    this.closeListeners.add(fn)
+    return () => this.closeListeners.delete(fn)
+  }
+
+  vibrate(ms = 8) {
+    safeVibrate(ms)
+  }
 }

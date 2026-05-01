@@ -1,27 +1,14 @@
-import type { CSSProperties, ComponentType } from 'react'
-import { getStationContent, UI_COPY, WANDERING_BARD } from '../../data'
-import type { PanelKey } from '../../data/types'
+import type { CSSProperties } from 'react'
+import { STATIONS, UI_COPY, WANDERING_BARD } from '../../data'
+import type { StationId } from '../../data/types'
 import { VIEW_H, VIEW_W } from '../../game/engine'
 import { DialogBox } from '../dialog-box'
 import { HUD } from '../hud'
 import { NpcModal } from '../npc-modal'
 import { StationModal } from '../station-modal'
 import { TouchPad } from '../touch-pad'
-import { AboutPanel } from '../stations/about-panel'
-import { ContactPanel } from '../stations/contact-panel'
-import { ExperiencePanel } from '../stations/experience-panel'
-import { SkillsPanel } from '../stations/skills-panel'
-import { TrophiesPanel } from '../stations/trophies-panel'
 import { useWorld } from './use-world'
 import styles from './world.module.css'
-
-const PANEL_BY_KEY: Record<PanelKey, ComponentType> = {
-  about: AboutPanel,
-  skills: SkillsPanel,
-  experience: ExperiencePanel,
-  trophies: TrophiesPanel,
-  contact: ContactPanel,
-}
 
 const VIEW_CSS_VARS = {
   ['--view-w']: VIEW_W,
@@ -33,9 +20,9 @@ type Props = {
 }
 
 export function World({ onSwitchView }: Props) {
-  const { canvasRef, modal, focus, pointerHandlers, closeModal } = useWorld()
+  const { engine, canvasRef, modal, focus, pointerHandlers, closeModal } = useWorld()
 
-  const stationFocus = focus?.kind === 'station' ? getStationContent(focus.id) : null
+  const stationFocus = focus?.kind === 'station' ? STATIONS[focus.id] : null
   const isNpcFocused = focus?.kind === 'npc'
   const isStationModal = modal?.kind === 'station'
   const isNpcModal = modal?.kind === 'npc'
@@ -71,7 +58,7 @@ export function World({ onSwitchView }: Props) {
         </div>
       </div>
 
-      <TouchPad />
+      <TouchPad engine={engine} />
 
       {isStationModal && <StationModalForId id={modal.id} onClose={closeModal} />}
 
@@ -81,15 +68,15 @@ export function World({ onSwitchView }: Props) {
 }
 
 type StationModalForIdProps = {
-  id: PanelKey
+  id: StationId
   onClose: () => void
 }
 
 function StationModalForId({ id, onClose }: StationModalForIdProps) {
-  const content = getStationContent(id)
-  const Panel = PANEL_BY_KEY[content.panel]
+  const station = STATIONS[id]
+  const Panel = station.Panel
   return (
-    <StationModal title={content.modalTitle} onClose={onClose}>
+    <StationModal title={station.modalTitle} onClose={onClose}>
       <Panel />
     </StationModal>
   )

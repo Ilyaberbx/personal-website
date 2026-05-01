@@ -1,5 +1,3 @@
-import type { StationId, StationSprite } from '../data/types'
-
 export const TILE = {
   Grass: 0,
   Path: 1,
@@ -64,22 +62,6 @@ export function isBlocked(x: number, y: number): boolean {
   const isOutOfBounds = x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT
   if (isOutOfBounds) return true
   return blocking.has(TILES[y][x])
-}
-
-export type StationPosition = {
-  x: number
-  y: number
-  sprite: StationSprite
-}
-
-export const STATION_IDS = ['about', 'skills', 'experience', 'trophies', 'contact'] as const satisfies readonly StationId[]
-
-export const STATION_POSITIONS: Record<StationId, StationPosition> = {
-  about: { x: 6, y: 4, sprite: 'tavern' },
-  skills: { x: 25, y: 4, sprite: 'armory' },
-  experience: { x: 16, y: 2, sprite: 'quest-board' },
-  trophies: { x: 25, y: 17, sprite: 'trophy-hall' },
-  contact: { x: 6, y: 17, sprite: 'mailbox' },
 }
 
 export type Prop = {
