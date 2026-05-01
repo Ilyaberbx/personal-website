@@ -96,16 +96,6 @@ export const PROPS: Prop[] = [
   { x: 27, y: 13, sprite: 'lamp', blocks: true },
 ]
 
-export function isPropBlocked(x: number, y: number): boolean {
-  return PROPS.some((p) => p.blocks && p.x === x && p.y === y)
-}
-
-export function isStationBlocked(x: number, y: number): boolean {
-  return STATION_IDS.some((id) => {
-    const pos = STATION_POSITIONS[id]
-    return pos.x === x && pos.y === y
-  })
-}
 
 export const SPAWN = { x: 16, y: 13, facing: 'up' as const }
 

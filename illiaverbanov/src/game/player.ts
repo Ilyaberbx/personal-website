@@ -1,6 +1,7 @@
 import type { Facing } from './sprites'
-import { isBlocked, isPropBlocked, isStationBlocked, NPC_POSITION, SPAWN } from './map'
+import { SPAWN } from './map'
 import { TILE_SIZE } from './tiles'
+import { tileOccupant, isWalkable } from './tile-occupant'
 
 const MOVE_SPEED_PX_PER_SEC = 90
 const TILES_PER_WALK_FRAME_SWAP = 0.5
@@ -34,16 +35,8 @@ function tileAt(px: number, py: number) {
   }
 }
 
-function isOccupiedByNpc(tx: number, ty: number): boolean {
-  return NPC_POSITION.x === tx && NPC_POSITION.y === ty
-}
-
 function isTileWalkable(tx: number, ty: number): boolean {
-  if (isBlocked(tx, ty)) return false
-  if (isPropBlocked(tx, ty)) return false
-  if (isStationBlocked(tx, ty)) return false
-  if (isOccupiedByNpc(tx, ty)) return false
-  return true
+  return isWalkable(tileOccupant(tx, ty))
 }
 
 function bothWalkable(ax: number, ay: number, bx: number, by: number): boolean {
