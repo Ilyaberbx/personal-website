@@ -27,6 +27,14 @@ describe('voxel registry', () => {
     expect(model?.id).toBe('about')
   })
 
+  it.each(['about', 'contact', 'experience', 'skills', 'trophies'] as const)(
+    'returns a model for the %s station focus',
+    (id) => {
+      const model = getVoxelModelForFocus({ kind: 'station', id })
+      expect(model?.id).toBe(id)
+    },
+  )
+
   it('returns null for null focus', () => {
     expect(getVoxelModelForFocus(null)).toBeNull()
   })
