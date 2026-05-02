@@ -76,7 +76,7 @@ function StationModalForId({ id, onClose }: StationModalForIdProps) {
   const station = STATIONS[id]
   const Panel = station.Panel
   return (
-    <StationModal title={station.modalTitle} onClose={onClose}>
+    <StationModal title={station.modalTitle} stationId={id} onClose={onClose}>
       <Panel />
     </StationModal>
   )
