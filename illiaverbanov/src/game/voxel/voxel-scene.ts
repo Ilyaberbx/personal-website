@@ -216,9 +216,6 @@ export function initVoxelScene(
         internals.geometry.dispose()
         internals.material.dispose()
         internals.renderer.dispose()
-        const ctx = internals.renderer.getContext()
-        const lose = ctx.getExtension('WEBGL_lose_context')
-        lose?.loseContext()
       },
       setModel: (m: VoxelModel) => {
         if (internals.disposed) return
