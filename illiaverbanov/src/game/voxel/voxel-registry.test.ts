@@ -38,4 +38,9 @@ describe('voxel registry', () => {
   it('returns null for null focus', () => {
     expect(getVoxelModelForFocus(null)).toBeNull()
   })
+
+  it('returns the bard model for the npc focus', () => {
+    const model = getVoxelModelForFocus({ kind: 'npc' })
+    expect(model?.id).toBe('bard')
+  })
 })

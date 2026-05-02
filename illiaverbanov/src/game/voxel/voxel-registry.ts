@@ -1,6 +1,7 @@
 import type { WorldFocus } from '../world'
 import type { VoxelModel } from './voxel.types'
 import { ABOUT_VOXEL_MODEL } from './models/about-model'
+import { BARD_VOXEL_MODEL } from './models/bard-model'
 import { CONTACT_VOXEL_MODEL } from './models/contact-model'
 import { EXPERIENCE_VOXEL_MODEL } from './models/experience-model'
 import { SKILLS_VOXEL_MODEL } from './models/skills-model'
@@ -16,13 +17,14 @@ const STATION_MODELS: Record<string, VoxelModel> = {
 
 export function getVoxelModelForFocus(focus: WorldFocus): VoxelModel | null {
   if (!focus) return null
-  if (focus.kind === 'npc') return null
+  if (focus.kind === 'npc') return BARD_VOXEL_MODEL
   if (focus.kind !== 'station') return null
   return STATION_MODELS[focus.id] ?? null
 }
 
 export const VOXEL_MODELS: readonly VoxelModel[] = [
   ABOUT_VOXEL_MODEL,
+  BARD_VOXEL_MODEL,
   CONTACT_VOXEL_MODEL,
   EXPERIENCE_VOXEL_MODEL,
   SKILLS_VOXEL_MODEL,
