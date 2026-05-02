@@ -7,7 +7,7 @@ type Props = {
 }
 
 export function HUD({ onSwitchView }: Props) {
-  const { name, title, level, levelPercent } = useHud()
+  const { name, title } = useHud()
 
   return (
     <div className={styles.hud}>
@@ -19,15 +19,6 @@ export function HUD({ onSwitchView }: Props) {
         <div className={`${styles.row} ${styles.rowClass}`}>
           <span className={styles.label}>Class</span>
           <span className={`${styles.value} ${styles.valueClass}`}>{title}</span>
-        </div>
-      </div>
-      <div className={styles.lvl}>
-        <span className={styles.label}>LVL</span>
-        <div className={styles.lvlRow}>
-          <span className={`${styles.value} ${styles.valueLvl}`}>{level}</span>
-          <div className={styles.bar} aria-hidden>
-            <div className={styles.barFill} style={{ width: `${levelPercent}%` }} />
-          </div>
         </div>
       </div>
       <div className={styles.toggle}>
