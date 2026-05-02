@@ -26,7 +26,19 @@ function toWorldFocus(entry: InteractableEntry): WorldFocus {
 }
 
 function matchesAdjacent(entry: InteractableEntry, tx: number, ty: number): boolean {
-  return manhattanDistance(entry.x, entry.y, tx, ty) <= ADJACENT_DISTANCE
+  if (entry.kind === 'npc') {
+    return manhattanDistance(entry.x, entry.y, tx, ty) <= ADJACENT_DISTANCE
+  }
+  const distanceToHead = manhattanDistance(entry.x, entry.y, tx, ty)
+  const distanceToFootprint = manhattanDistance(
+    entry.x,
+    entry.y + STATION_HEAD_TILE_OFFSET,
+    tx,
+    ty,
+  )
+  const isAdjacentToHead = distanceToHead <= ADJACENT_DISTANCE
+  const isAdjacentToFootprint = distanceToFootprint <= ADJACENT_DISTANCE
+  return isAdjacentToHead || isAdjacentToFootprint
 }
 
 function matchesExact(entry: InteractableEntry, tx: number, ty: number): boolean {

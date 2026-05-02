@@ -48,8 +48,26 @@ describe('interactableAt — adjacent mode', () => {
     expect(result).toEqual({ kind: 'station', id: 'about' })
   })
 
-  it('returns null when tile is distance 2 away (outside adjacent range)', () => {
-    const tile: Tile = { tx: 10, ty: 7 }
+  it('returns station focus when tile is below the station footprint (approach from below)', () => {
+    const tile: Tile = { tx: 10, ty: 5 + STATION_HEAD_TILE_OFFSET + 1 }
+    const result = interactableAt(tile, 'adjacent', FIXTURE_REGISTRY)
+    expect(result).toEqual({ kind: 'station', id: 'about' })
+  })
+
+  it('returns station focus when tile is left of the station footprint', () => {
+    const tile: Tile = { tx: 9, ty: 5 + STATION_HEAD_TILE_OFFSET }
+    const result = interactableAt(tile, 'adjacent', FIXTURE_REGISTRY)
+    expect(result).toEqual({ kind: 'station', id: 'about' })
+  })
+
+  it('returns station focus when tile is right of the station footprint', () => {
+    const tile: Tile = { tx: 11, ty: 5 + STATION_HEAD_TILE_OFFSET }
+    const result = interactableAt(tile, 'adjacent', FIXTURE_REGISTRY)
+    expect(result).toEqual({ kind: 'station', id: 'about' })
+  })
+
+  it('returns null when tile is two tiles below the station footprint (outside range)', () => {
+    const tile: Tile = { tx: 10, ty: 5 + STATION_HEAD_TILE_OFFSET + 2 }
     expect(interactableAt(tile, 'adjacent', FIXTURE_REGISTRY)).toBeNull()
   })
 })

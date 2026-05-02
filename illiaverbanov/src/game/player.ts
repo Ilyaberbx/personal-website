@@ -30,8 +30,8 @@ export function createPlayer(): PlayerState {
 
 function tileAt(px: number, py: number) {
   return {
-    tx: Math.round(px / TILE_SIZE),
-    ty: Math.round(py / TILE_SIZE),
+    tx: Math.floor(px / TILE_SIZE),
+    ty: Math.floor(py / TILE_SIZE),
   }
 }
 
