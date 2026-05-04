@@ -97,28 +97,30 @@ canvas, img {
 .pixel-window {
   background: var(--c-bg);
   color: var(--c-text);
-  border: 3px solid var(--c-border);
+  border: 2px solid var(--c-border);
   box-shadow:
-    0 0 0 3px var(--c-bg-dark),
-    0 0 0 6px var(--c-primary-dark),
-    0 6px 0 6px rgba(0, 0, 0, 0.5);
-  padding: 16px 14px 14px;
+    0 0 0 2px var(--c-bg-dark),
+    0 0 0 4px var(--c-primary-dark),
+    0 4px 0 4px rgba(0, 0, 0, 0.5);
+  padding: 14px 10px 12px;
   position: relative;
-  margin: 14px 6px 12px;
+  margin: 10px 4px 8px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .pixel-window__title {
   font-family: var(--font-display);
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 1px;
   color: var(--c-text);
   background: var(--c-primary-dark);
-  padding: 5px 8px;
+  padding: 4px 6px;
   border: 2px solid var(--c-border);
   position: absolute;
-  top: -14px;
-  left: 10px;
-  right: 56px;
+  top: -12px;
+  left: 8px;
+  right: 44px;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
@@ -128,7 +130,7 @@ canvas, img {
 .pixel-window__close {
   position: absolute;
   top: -12px;
-  right: 8px;
+  right: 6px;
   width: 28px;
   height: 28px;
   background: var(--c-primary-dark);
@@ -171,6 +173,14 @@ canvas, img {
     border-width: 3px;
     font-size: 12px;
   }
+}
+
+@media (max-width: 360px) {
+  .pixel-window {
+    padding: 12px 8px 10px;
+    margin: 8px 2px 6px;
+  }
+  .pixel-window__title { font-size: 8px; right: 40px; left: 6px; }
 }
 
 .view-toggle {

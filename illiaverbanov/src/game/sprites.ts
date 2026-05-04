@@ -452,17 +452,41 @@ function paintPedestal(): SpriteCanvas {
 }
 
 function paintArchway(): SpriteCanvas {
-  const canvas = makeCanvas(SPRITE_SIZE, SPRITE_SIZE)
+  const W = SPRITE_SIZE * 3
+  const H = SPRITE_SIZE * 2
+  const canvas = makeCanvas(W, H)
   const ctx = canvas.getContext('2d')!
-  paintPx(ctx, SHADE.borderDim, 1, 4, 14, 11)
-  paintPx(ctx, PAL.border, 2, 4, 12, 1)
-  paintPx(ctx, SHADE.bgDark, 4, 6, 8, 9)
-  paintPx(ctx, PAL.primary, 5, 7, 6, 1)
-  paintPx(ctx, SHADE.primaryDark, 5, 8, 6, 6)
-  paintPx(ctx, SHADE.primaryLight, 7, 9, 2, 1)
-  paintPx(ctx, SHADE.bgDark, 1, 14, 14, 1)
-  paintPx(ctx, PAL.border, 1, 3, 1, 1)
-  paintPx(ctx, PAL.border, 14, 3, 1, 1)
+
+  paintPx(ctx, SHADE.borderDim, 4, 6, 40, 25)
+  paintPx(ctx, PAL.border, 4, 6, 40, 1)
+  paintPx(ctx, PAL.border, 3, 7, 1, 24)
+  paintPx(ctx, PAL.border, 44, 7, 1, 24)
+  paintPx(ctx, PAL.border, 5, 5, 38, 1)
+  paintPx(ctx, PAL.border, 7, 4, 34, 1)
+
+  paintPx(ctx, SHADE.bgDark, 14, 11, 20, 21)
+  paintPx(ctx, PAL.primary, 15, 12, 18, 1)
+  paintPx(ctx, SHADE.primaryDark, 15, 13, 18, 14)
+  paintPx(ctx, SHADE.primaryLight, 22, 14, 4, 2)
+  paintPx(ctx, PAL.border, 14, 11, 1, 21)
+  paintPx(ctx, PAL.border, 33, 11, 1, 21)
+
+  for (let stripeY = 14; stripeY < 30; stripeY += 4) {
+    paintPx(ctx, PAL.border, 5, stripeY, 9, 1)
+    paintPx(ctx, PAL.border, 34, stripeY, 9, 1)
+  }
+  for (let stripeX = 5; stripeX < 14; stripeX += 4) {
+    paintPx(ctx, PAL.border, stripeX, 11, 1, 20)
+  }
+  for (let stripeX = 38; stripeX < 44; stripeX += 4) {
+    paintPx(ctx, PAL.border, stripeX, 11, 1, 20)
+  }
+
+  paintPx(ctx, PAL.border, 22, 3, 4, 1)
+  paintPx(ctx, SHADE.borderDim, 22, 4, 4, 2)
+  paintPx(ctx, SHADE.primaryLight, 23, 4, 2, 1)
+
+  paintPx(ctx, SHADE.bgDark, 3, 31, 42, 1)
   return canvas
 }
 

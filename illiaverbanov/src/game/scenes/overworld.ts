@@ -27,6 +27,7 @@ const RAW_MAP = [
 ]
 
 const ARCHWAY_TILE = { x: 16, y: 20 }
+const ARCHWAY_SPRITE_ANCHOR = { x: ARCHWAY_TILE.x - 1, y: ARCHWAY_TILE.y - 1 }
 
 export const OVERWORLD: Scene = {
   id: 'overworld',
@@ -38,7 +39,7 @@ export const OVERWORLD: Scene = {
     { x: 18, y: 11, sprite: 'fountain', blocks: true },
     { x: 4, y: 9, sprite: 'lamp', blocks: true },
     { x: 27, y: 13, sprite: 'lamp', blocks: true },
-    { x: ARCHWAY_TILE.x, y: ARCHWAY_TILE.y, sprite: 'archway' },
+    { x: ARCHWAY_SPRITE_ANCHOR.x, y: ARCHWAY_SPRITE_ANCHOR.y, sprite: 'archway' },
   ],
   spawn: { x: 16, y: 13, facing: 'up' },
   doors: [
