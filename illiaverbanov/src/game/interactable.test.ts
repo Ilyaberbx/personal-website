@@ -96,3 +96,23 @@ describe('interactableAt — door focus from active scene', () => {
     })
   })
 })
+
+describe('interactableAt — sculpture focus from active scene', () => {
+  it('returns a sculpture focus carrying the right project id from a sculpture tile in the active scene', () => {
+    const hall = getScene('exhibition-hall')
+    const registry = buildRegistry(hall)
+    const sculpture = hall.sculptures[0]
+    const tile: Tile = { tx: sculpture.x, ty: sculpture.y }
+    const result = interactableAt(tile, 'exact', registry)
+    expect(result).toEqual({ kind: 'sculpture', projectId: sculpture.projectId })
+  })
+
+  it('returns a sculpture focus when adjacent to a sculpture tile', () => {
+    const hall = getScene('exhibition-hall')
+    const registry = buildRegistry(hall)
+    const sculpture = hall.sculptures[0]
+    const tile: Tile = { tx: sculpture.x, ty: sculpture.y + 1 }
+    const result = interactableAt(tile, 'adjacent', registry)
+    expect(result).toEqual({ kind: 'sculpture', projectId: sculpture.projectId })
+  })
+})

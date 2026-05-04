@@ -7,6 +7,7 @@ export type WorldFocus =
   | { kind: 'station'; id: StationId }
   | { kind: 'npc' }
   | { kind: 'door'; targetSceneId: SceneId; targetSpawn: SceneSpawn; label: string; hint: string }
+  | { kind: 'sculpture'; projectId: string }
   | null
 
 export type InteractableEntry =
@@ -21,6 +22,7 @@ export type InteractableEntry =
       label: string
       hint: string
     }
+  | { kind: 'sculpture'; projectId: string; x: number; y: number }
 
 const ADJACENT_DISTANCE = 1
 const STATION_HEAD_TILE_OFFSET = 1
@@ -32,6 +34,7 @@ function manhattanDistance(ax: number, ay: number, bx: number, by: number): numb
 function toWorldFocus(entry: InteractableEntry): WorldFocus {
   if (entry.kind === 'station') return { kind: 'station', id: entry.id }
   if (entry.kind === 'npc') return { kind: 'npc' }
+  if (entry.kind === 'sculpture') return { kind: 'sculpture', projectId: entry.projectId }
   return {
     kind: 'door',
     targetSceneId: entry.targetSceneId,
@@ -87,7 +90,13 @@ export function buildRegistry(scene: Scene): InteractableEntry[] {
     label: d.label,
     hint: d.hint,
   }))
-  return [...stations, ...npcs, ...doors]
+  const sculptures: InteractableEntry[] = scene.sculptures.map((s) => ({
+    kind: 'sculpture',
+    projectId: s.projectId,
+    x: s.x,
+    y: s.y,
+  }))
+  return [...stations, ...npcs, ...doors, ...sculptures]
 }
 
 export function interactableAt(

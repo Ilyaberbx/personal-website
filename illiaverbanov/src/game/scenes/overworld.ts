@@ -59,6 +59,7 @@ export const OVERWORLD: Scene = {
     { id: 'contact', x: 6, y: 17 },
   ],
   npcs: [{ x: 17, y: 13 }],
+  sculptures: [],
 }
 
 export const OVERWORLD_ARCHWAY_TILE = ARCHWAY_TILE

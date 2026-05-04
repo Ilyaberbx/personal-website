@@ -6,6 +6,8 @@ import { getTileCanvas, getAltGrassCanvas, TILE_SIZE } from './tiles'
 import { getPlayerSprite, getStationSprite, getNpcSprite, getPropSprite } from './sprites'
 import type { PlayerState } from './player'
 import { PAL, SHADE } from './palette'
+import { getSculptureVoxelModel } from './voxel/project-sculptures'
+import { getVoxelTopperSprite } from './voxel/voxel-sprite'
 
 export type Camera = {
   x: number
@@ -22,6 +24,9 @@ const NPC_HIGHLIGHT_X = 8
 const NPC_HIGHLIGHT_Y = 18
 const DOOR_HIGHLIGHT_X = 8
 const DOOR_HIGHLIGHT_Y = 4
+const SCULPTURE_TOPPER_Y_OFFSET = -16
+const SCULPTURE_HIGHLIGHT_X = 8
+const SCULPTURE_HIGHLIGHT_Y = -2
 const HIGHLIGHT_PERIOD_MS = 220
 const HIGHLIGHT_BOUNCE_PX = -2
 
@@ -29,6 +34,7 @@ export type FocusKindForHighlight =
   | { kind: 'station'; id: StationId }
   | { kind: 'npc' }
   | { kind: 'door'; targetSceneId: SceneId }
+  | { kind: 'sculpture'; projectId: string }
   | null
 
 export function computeCamera(
@@ -70,6 +76,7 @@ export function renderWorld(
   const drawables: Drawable[] = [
     ...buildStationDrawables(ctx, scene, camera, highlightFocus),
     ...buildNpcDrawables(ctx, scene, camera, highlightFocus),
+    ...buildSculptureDrawables(ctx, scene, camera, highlightFocus),
     buildPlayerDrawable(ctx, camera, player),
   ]
   drawables.sort((a, b) => a.y - b.y)
@@ -155,6 +162,30 @@ function buildNpcDrawables(
       const sy = npc.y * TILE_SIZE - camera.y
       ctx.drawImage(sprite, sx, sy)
       if (npcFocused) drawHighlight(ctx, sx + NPC_HIGHLIGHT_X, sy + NPC_HIGHLIGHT_Y)
+    },
+  }))
+}
+
+function buildSculptureDrawables(
+  ctx: CanvasRenderingContext2D,
+  scene: Scene,
+  camera: Camera,
+  focus: FocusKindForHighlight,
+): Drawable[] {
+  const highlightedProjectId = focus?.kind === 'sculpture' ? focus.projectId : null
+  return scene.sculptures.map((sculpture) => ({
+    y: sculpture.y * TILE_SIZE,
+    draw: () => {
+      const model = getSculptureVoxelModel(sculpture.projectId)
+      if (!model) return
+      const sprite = getVoxelTopperSprite(model)
+      const sx = sculpture.x * TILE_SIZE - camera.x
+      const sy = sculpture.y * TILE_SIZE - camera.y + SCULPTURE_TOPPER_Y_OFFSET
+      ctx.drawImage(sprite, sx, sy)
+      const isHighlighted = highlightedProjectId === sculpture.projectId
+      if (isHighlighted) {
+        drawHighlight(ctx, sx + SCULPTURE_HIGHLIGHT_X, sy + SCULPTURE_HIGHLIGHT_Y)
+      }
     },
   }))
 }

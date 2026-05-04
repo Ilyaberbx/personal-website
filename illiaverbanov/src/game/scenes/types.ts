@@ -4,7 +4,7 @@ import type { Facing } from '../sprites'
 
 export type SceneId = 'overworld' | 'exhibition-hall'
 
-export type ScenePropSprite = 'lamp' | 'fountain' | 'archway'
+export type ScenePropSprite = 'lamp' | 'fountain' | 'archway' | 'pedestal'
 
 export type SceneProp = {
   x: number
@@ -22,6 +22,12 @@ export type SceneStation = {
 export type SceneNpc = {
   x: number
   y: number
+}
+
+export type SceneSculpture = {
+  x: number
+  y: number
+  projectId: string
 }
 
 export type SceneDoor = {
@@ -49,4 +55,5 @@ export type Scene = {
   doors: SceneDoor[]
   stations: SceneStation[]
   npcs: SceneNpc[]
+  sculptures: SceneSculpture[]
 }

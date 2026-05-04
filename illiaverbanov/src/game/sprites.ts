@@ -435,6 +435,22 @@ function paintLamp(): SpriteCanvas {
   return canvas
 }
 
+function paintPedestal(): SpriteCanvas {
+  const canvas = makeCanvas(SPRITE_SIZE, SPRITE_SIZE)
+  const ctx = canvas.getContext('2d')!
+  paintPx(ctx, SHADE.borderDim, 2, 4, 12, 9)
+  paintPx(ctx, PAL.border, 2, 4, 12, 1)
+  paintPx(ctx, SHADE.bgDark, 2, 12, 12, 1)
+  paintPx(ctx, SHADE.borderDim, 1, 13, 14, 2)
+  paintPx(ctx, PAL.border, 1, 13, 14, 1)
+  paintPx(ctx, SHADE.bgDark, 1, 15, 14, 1)
+  for (let stripeY = 6; stripeY < 12; stripeY += 3) {
+    paintPx(ctx, SHADE.bgDark, 3, stripeY, 10, 1)
+  }
+  paintPx(ctx, PAL.text, 3, 5, 10, 1)
+  return canvas
+}
+
 function paintArchway(): SpriteCanvas {
   const canvas = makeCanvas(SPRITE_SIZE, SPRITE_SIZE)
   const ctx = canvas.getContext('2d')!
@@ -454,6 +470,7 @@ const propPainters = {
   fountain: paintFountain,
   lamp: paintLamp,
   archway: paintArchway,
+  pedestal: paintPedestal,
 } as const
 
 export function getPropSprite(name: keyof typeof propPainters): SpriteCanvas {

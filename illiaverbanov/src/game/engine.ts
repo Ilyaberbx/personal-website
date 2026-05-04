@@ -24,6 +24,7 @@ const MAX_FRAME_SECONDS = 1 / 30
 export type EngineModal =
   | { kind: 'station'; id: StationId }
   | { kind: 'npc' }
+  | { kind: 'project'; projectId: string }
   | null
 
 export type EngineState = {
@@ -164,6 +165,7 @@ export class Engine {
     if (!focus) return null
     if (focus.kind === 'station') return { kind: 'station', id: focus.id }
     if (focus.kind === 'npc') return { kind: 'npc' }
+    if (focus.kind === 'sculpture') return { kind: 'sculpture', projectId: focus.projectId }
     return { kind: 'door', targetSceneId: focus.targetSceneId }
   }
 
@@ -178,6 +180,10 @@ export class Engine {
     }
     if (f.kind === 'npc') {
       this.setState({ modal: { kind: 'npc' } })
+      return
+    }
+    if (f.kind === 'sculpture') {
+      this.setState({ modal: { kind: 'project', projectId: f.projectId } })
       return
     }
     this.transitionToScene(f.targetSceneId, f.targetSpawn)
@@ -222,6 +228,10 @@ export class Engine {
     }
     if (hit.kind === 'station') {
       this.setState({ modal: { kind: 'station', id: hit.id } })
+      return true
+    }
+    if (hit.kind === 'sculpture') {
+      this.setState({ modal: { kind: 'project', projectId: hit.projectId } })
       return true
     }
     this.setState({ modal: { kind: 'npc' } })
