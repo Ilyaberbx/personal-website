@@ -54,6 +54,23 @@ export type NpcContent = {
   lines: string[]
 }
 
+export type ProjectDomain = 'web3' | 'gamedev'
+
+export type ProjectLink = { label: string; href: string }
+
+export type Project = {
+  id: string
+  name: string
+  domain: ProjectDomain
+  tagline: string
+  role: string
+  period: string
+  stack: string[]
+  link?: ProjectLink
+  pitch: string
+  contributions: string[]
+}
+
 export type ContactItem = {
   label: string
   value: string

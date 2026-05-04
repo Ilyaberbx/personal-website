@@ -5,8 +5,10 @@ export type PlainViewProps = {
   onSwitchView: () => void
 }
 
+export type SectionId = StationId | 'portfolio'
+
 export type SectionDescriptor = {
-  id: StationId
+  id: SectionId
   title: string
   Panel: ComponentType
 }
