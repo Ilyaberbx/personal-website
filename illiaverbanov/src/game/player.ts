@@ -1,5 +1,5 @@
 import type { Facing } from './sprites'
-import { SPAWN } from './map'
+import type { Scene, SceneSpawn } from './scenes/types'
 import { TILE_SIZE } from './tiles'
 import { tileOccupant, isWalkable } from './tile-occupant'
 
@@ -17,15 +17,24 @@ export type PlayerState = {
   moving: boolean
 }
 
-export function createPlayer(): PlayerState {
+export function createPlayer(spawn: SceneSpawn): PlayerState {
   return {
-    px: SPAWN.x * TILE_SIZE,
-    py: SPAWN.y * TILE_SIZE,
-    facing: SPAWN.facing,
+    px: spawn.x * TILE_SIZE,
+    py: spawn.y * TILE_SIZE,
+    facing: spawn.facing,
     moveAccum: 0,
     walkFrame: 0,
     moving: false,
   }
+}
+
+export function spawnPlayer(p: PlayerState, spawn: SceneSpawn) {
+  p.px = spawn.x * TILE_SIZE
+  p.py = spawn.y * TILE_SIZE
+  p.facing = spawn.facing
+  p.moveAccum = 0
+  p.walkFrame = 0
+  p.moving = false
 }
 
 function tileAt(px: number, py: number) {
@@ -35,12 +44,18 @@ function tileAt(px: number, py: number) {
   }
 }
 
-function isTileWalkable(tx: number, ty: number): boolean {
-  return isWalkable(tileOccupant(tx, ty))
+function isTileWalkable(scene: Scene, tx: number, ty: number): boolean {
+  return isWalkable(tileOccupant(scene, tx, ty))
 }
 
-function bothWalkable(ax: number, ay: number, bx: number, by: number): boolean {
-  return isTileWalkable(ax, ay) && isTileWalkable(bx, by)
+function bothWalkable(
+  scene: Scene,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
+): boolean {
+  return isTileWalkable(scene, ax, ay) && isTileWalkable(scene, bx, by)
 }
 
 function isOnSecondWalkFrame(tilesWalked: number): boolean {
@@ -48,6 +63,7 @@ function isOnSecondWalkFrame(tilesWalked: number): boolean {
 }
 
 export function updatePlayer(
+  scene: Scene,
   p: PlayerState,
   dt: number,
   dir: 'up' | 'down' | 'left' | 'right' | null,
@@ -75,7 +91,7 @@ export function updatePlayer(
     const targetTileX = Math.floor(leadingEdgeX / TILE_SIZE)
     const headTileY = Math.floor((p.py + BODY_INSET_PX) / TILE_SIZE)
     const feetTileY = Math.floor((p.py + BODY_LAST_PIXEL_PX) / TILE_SIZE)
-    const canMoveX = bothWalkable(targetTileX, headTileY, targetTileX, feetTileY)
+    const canMoveX = bothWalkable(scene, targetTileX, headTileY, targetTileX, feetTileY)
     if (canMoveX) p.px = nextPx
   }
   if (dy !== 0) {
@@ -84,7 +100,7 @@ export function updatePlayer(
     const targetTileY = Math.floor(leadingEdgeY / TILE_SIZE)
     const leftTileX = Math.floor((p.px + BODY_INSET_PX) / TILE_SIZE)
     const rightTileX = Math.floor((p.px + BODY_LAST_PIXEL_PX) / TILE_SIZE)
-    const canMoveY = bothWalkable(leftTileX, targetTileY, rightTileX, targetTileY)
+    const canMoveY = bothWalkable(scene, leftTileX, targetTileY, rightTileX, targetTileY)
     if (canMoveY) p.py = nextPy
   }
 

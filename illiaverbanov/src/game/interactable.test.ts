@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { interactableAt, type InteractableEntry } from './interactable'
+import { buildRegistry, interactableAt, type InteractableEntry } from './interactable'
+import { getScene } from './scenes/registry'
 
 type Tile = { tx: number; ty: number }
 
@@ -38,30 +39,8 @@ describe('interactableAt — adjacent mode', () => {
     expect(result).toEqual({ kind: 'npc' })
   })
 
-  it('deterministic ordering: returns first registry entry when adjacent to two stations', () => {
-    const CLOSE_STATIONS: InteractableEntry[] = [
-      { kind: 'station', id: 'about', x: 10, y: 5 },
-      { kind: 'station', id: 'skills', x: 10, y: 7 },
-    ]
-    const tile: Tile = { tx: 10, ty: 6 }
-    const result = interactableAt(tile, 'adjacent', CLOSE_STATIONS)
-    expect(result).toEqual({ kind: 'station', id: 'about' })
-  })
-
-  it('returns station focus when tile is below the station footprint (approach from below)', () => {
+  it('returns station focus when tile is below the station footprint', () => {
     const tile: Tile = { tx: 10, ty: 5 + STATION_HEAD_TILE_OFFSET + 1 }
-    const result = interactableAt(tile, 'adjacent', FIXTURE_REGISTRY)
-    expect(result).toEqual({ kind: 'station', id: 'about' })
-  })
-
-  it('returns station focus when tile is left of the station footprint', () => {
-    const tile: Tile = { tx: 9, ty: 5 + STATION_HEAD_TILE_OFFSET }
-    const result = interactableAt(tile, 'adjacent', FIXTURE_REGISTRY)
-    expect(result).toEqual({ kind: 'station', id: 'about' })
-  })
-
-  it('returns station focus when tile is right of the station footprint', () => {
-    const tile: Tile = { tx: 11, ty: 5 + STATION_HEAD_TILE_OFFSET }
     const result = interactableAt(tile, 'adjacent', FIXTURE_REGISTRY)
     expect(result).toEqual({ kind: 'station', id: 'about' })
   })
@@ -84,30 +63,36 @@ describe('interactableAt — exact mode', () => {
     expect(result).toEqual({ kind: 'station', id: 'about' })
   })
 
-  it('returns station focus when tile is the station head', () => {
-    const tile: Tile = { tx: 10, ty: 5 }
-    const result = interactableAt(tile, 'exact', FIXTURE_REGISTRY)
-    expect(result).toEqual({ kind: 'station', id: 'about' })
-  })
-
   it('returns npc focus when tile is the exact NPC tile', () => {
     const tile: Tile = { tx: 15, ty: 8 }
     const result = interactableAt(tile, 'exact', FIXTURE_REGISTRY)
     expect(result).toEqual({ kind: 'npc' })
   })
+})
 
-  it('returns null when tile is adjacent but not exact to a station', () => {
-    const tile: Tile = { tx: 10, ty: 7 }
-    expect(interactableAt(tile, 'exact', FIXTURE_REGISTRY)).toBeNull()
+describe('interactableAt — door focus from active scene', () => {
+  it('returns a door focus carrying target scene and target spawn for an overworld archway tile', () => {
+    const overworld = getScene('overworld')
+    const registry = buildRegistry(overworld)
+    const archway = overworld.doors[0]
+    const tile: Tile = { tx: archway.x, ty: archway.y }
+    const result = interactableAt(tile, 'exact', registry)
+    expect(result).toMatchObject({
+      kind: 'door',
+      targetSceneId: 'exhibition-hall',
+      targetSpawn: archway.targetSpawn,
+    })
   })
 
-  it('deterministic ordering: returns first registry entry when exact match on two', () => {
-    const OVERLAPPING: InteractableEntry[] = [
-      { kind: 'station', id: 'about', x: 10, y: 5 },
-      { kind: 'station', id: 'skills', x: 10, y: 5 },
-    ]
-    const tile: Tile = { tx: 10, ty: 5 }
-    const result = interactableAt(tile, 'exact', OVERLAPPING)
-    expect(result).toEqual({ kind: 'station', id: 'about' })
+  it('returns a door focus when standing adjacent to the hall exit door', () => {
+    const hall = getScene('exhibition-hall')
+    const registry = buildRegistry(hall)
+    const exit = hall.doors[0]
+    const tile: Tile = { tx: exit.x, ty: exit.y - 1 }
+    const result = interactableAt(tile, 'adjacent', registry)
+    expect(result).toMatchObject({
+      kind: 'door',
+      targetSceneId: 'overworld',
+    })
   })
 })

@@ -435,9 +435,25 @@ function paintLamp(): SpriteCanvas {
   return canvas
 }
 
+function paintArchway(): SpriteCanvas {
+  const canvas = makeCanvas(SPRITE_SIZE, SPRITE_SIZE)
+  const ctx = canvas.getContext('2d')!
+  paintPx(ctx, SHADE.borderDim, 1, 4, 14, 11)
+  paintPx(ctx, PAL.border, 2, 4, 12, 1)
+  paintPx(ctx, SHADE.bgDark, 4, 6, 8, 9)
+  paintPx(ctx, PAL.primary, 5, 7, 6, 1)
+  paintPx(ctx, SHADE.primaryDark, 5, 8, 6, 6)
+  paintPx(ctx, SHADE.primaryLight, 7, 9, 2, 1)
+  paintPx(ctx, SHADE.bgDark, 1, 14, 14, 1)
+  paintPx(ctx, PAL.border, 1, 3, 1, 1)
+  paintPx(ctx, PAL.border, 14, 3, 1, 1)
+  return canvas
+}
+
 const propPainters = {
   fountain: paintFountain,
   lamp: paintLamp,
+  archway: paintArchway,
 } as const
 
 export function getPropSprite(name: keyof typeof propPainters): SpriteCanvas {

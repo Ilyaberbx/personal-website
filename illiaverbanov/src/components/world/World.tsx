@@ -23,6 +23,7 @@ export function World({ onSwitchView }: Props) {
   const { engine, canvasRef, modal, focus, pointerHandlers, closeModal } = useWorld()
 
   const stationFocus = focus?.kind === 'station' ? STATIONS[focus.id] : null
+  const doorFocus = focus?.kind === 'door' ? focus : null
   const isNpcFocused = focus?.kind === 'npc'
   const isStationModal = modal?.kind === 'station'
   const isNpcModal = modal?.kind === 'npc'
@@ -45,6 +46,9 @@ export function World({ onSwitchView }: Props) {
 
         {!modal && stationFocus && (
           <DialogBox label={stationFocus.label} hint={stationFocus.hint} variant="station" />
+        )}
+        {!modal && doorFocus && (
+          <DialogBox label={doorFocus.label} hint={doorFocus.hint} variant="station" />
         )}
         {!modal && isNpcFocused && (
           <DialogBox label={WANDERING_BARD.name} hint={WANDERING_BARD.hint} variant="npc" />

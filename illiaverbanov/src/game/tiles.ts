@@ -135,6 +135,26 @@ function paintLamp(ctx: CanvasRenderingContext2D) {
   ctx.fillRect(7, 2, 2, 1)
 }
 
+const FLOOR_PLANK_RECTS: readonly PixelRect[] = [
+  { x: 0, y: 0, w: 16, h: 4 },
+  { x: 0, y: 4, w: 16, h: 4 },
+  { x: 0, y: 8, w: 16, h: 4 },
+  { x: 0, y: 12, w: 16, h: 4 },
+]
+
+function paintFloor(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = SHADE.treeBark
+  ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE)
+  fillRects(ctx, SHADE.bgMid, FLOOR_PLANK_RECTS.filter((_, i) => i % 2 === 0))
+  ctx.fillStyle = SHADE.bgDark
+  for (let y = 3; y < TILE_SIZE; y += 4) ctx.fillRect(0, y, TILE_SIZE, 1)
+  ctx.fillStyle = SHADE.borderDim
+  ctx.fillRect(2, 1, 1, 1)
+  ctx.fillRect(11, 5, 1, 1)
+  ctx.fillRect(6, 9, 1, 1)
+  ctx.fillRect(13, 13, 1, 1)
+}
+
 const painters: Record<TileId, (ctx: CanvasRenderingContext2D) => void> = {
   [TILE.Grass]: (ctx) => paintGrass(ctx, false),
   [TILE.Path]: paintPath,
@@ -143,6 +163,7 @@ const painters: Record<TileId, (ctx: CanvasRenderingContext2D) => void> = {
   [TILE.Wall]: paintWall,
   [TILE.Flower]: paintFlower,
   [TILE.Lamp]: paintLamp,
+  [TILE.Floor]: paintFloor,
 }
 
 export function getTileCanvas(id: TileId): HTMLCanvasElement {

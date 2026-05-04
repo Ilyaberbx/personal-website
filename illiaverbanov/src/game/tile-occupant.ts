@@ -1,51 +1,75 @@
 import type { StationId } from '../data/types'
-import { STATIONS } from '../data/stations'
-import type { Prop } from './map'
-import {
-  TILES,
-  TILE,
-  PROPS,
-  NPC_POSITION,
-  isBlocked,
-} from './map'
+import type { Scene, SceneProp } from './scenes/types'
+import { TILE, isBlockingTile, type TileId } from './map'
 
 export type Occupant =
   | { kind: 'empty' }
-  | { kind: 'terrain'; tile: (typeof TILE)[keyof typeof TILE] }
-  | { kind: 'prop'; prop: Prop }
+  | { kind: 'terrain'; tile: TileId }
+  | { kind: 'prop'; prop: SceneProp }
   | { kind: 'station'; id: StationId; role: 'footprint' | 'head' }
   | { kind: 'npc' }
+  | { kind: 'door'; doorIndex: number }
 
-function findStationOccupant(x: number, y: number): Extract<Occupant, { kind: 'station' }> | null {
-  for (const [id, station] of Object.entries(STATIONS) as [StationId, (typeof STATIONS)[StationId]][]) {
+function findStationOccupant(
+  scene: Scene,
+  x: number,
+  y: number,
+): Extract<Occupant, { kind: 'station' }> | null {
+  for (const station of scene.stations) {
     const isHeadTile = station.x === x && station.y === y
-    if (isHeadTile) return { kind: 'station', id, role: 'head' }
+    if (isHeadTile) return { kind: 'station', id: station.id, role: 'head' }
     const isFootprintTile = station.x === x && station.y + 1 === y
-    if (isFootprintTile) return { kind: 'station', id, role: 'footprint' }
+    if (isFootprintTile) return { kind: 'station', id: station.id, role: 'footprint' }
   }
   return null
 }
 
-function findPropOccupant(x: number, y: number): Extract<Occupant, { kind: 'prop' }> | null {
-  const prop = PROPS.find((p) => p.x === x && p.y === y)
+function findPropOccupant(
+  scene: Scene,
+  x: number,
+  y: number,
+): Extract<Occupant, { kind: 'prop' }> | null {
+  const prop = scene.props.find((p) => p.x === x && p.y === y)
   return prop ? { kind: 'prop', prop } : null
 }
 
-export function tileOccupant(x: number, y: number): Occupant {
-  const isNpc = NPC_POSITION.x === x && NPC_POSITION.y === y
-  if (isNpc) return { kind: 'npc' }
+function findNpcOccupant(
+  scene: Scene,
+  x: number,
+  y: number,
+): Extract<Occupant, { kind: 'npc' }> | null {
+  const matches = scene.npcs.some((n) => n.x === x && n.y === y)
+  return matches ? { kind: 'npc' } : null
+}
 
-  const stationOccupant = findStationOccupant(x, y)
-  if (stationOccupant) return stationOccupant
+function findDoorOccupant(
+  scene: Scene,
+  x: number,
+  y: number,
+): Extract<Occupant, { kind: 'door' }> | null {
+  const idx = scene.doors.findIndex((d) => d.x === x && d.y === y)
+  if (idx < 0) return null
+  return { kind: 'door', doorIndex: idx }
+}
 
-  const propOccupant = findPropOccupant(x, y)
-  if (propOccupant) return propOccupant
-
-  const isOutOfBounds = x < 0 || y < 0
+export function tileOccupant(scene: Scene, x: number, y: number): Occupant {
+  const isOutOfBounds = x < 0 || y < 0 || x >= scene.width || y >= scene.height
   if (isOutOfBounds) return { kind: 'terrain', tile: TILE.Wall }
 
-  const isBlockingTerrain = isBlocked(x, y)
-  if (isBlockingTerrain) return { kind: 'terrain', tile: TILES[y][x] }
+  const npc = findNpcOccupant(scene, x, y)
+  if (npc) return npc
+
+  const station = findStationOccupant(scene, x, y)
+  if (station) return station
+
+  const door = findDoorOccupant(scene, x, y)
+  if (door) return door
+
+  const prop = findPropOccupant(scene, x, y)
+  if (prop) return prop
+
+  const tile = scene.tiles[y][x]
+  if (isBlockingTile(tile)) return { kind: 'terrain', tile }
 
   return { kind: 'empty' }
 }
@@ -61,5 +85,6 @@ export function isWalkable(occupant: Occupant): boolean {
 export function isInteractable(occupant: Occupant): boolean {
   if (occupant.kind === 'station') return true
   if (occupant.kind === 'npc') return true
+  if (occupant.kind === 'door') return true
   return false
 }
