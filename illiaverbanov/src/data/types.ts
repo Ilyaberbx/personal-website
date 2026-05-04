@@ -66,7 +66,6 @@ export type Project = {
   domain: ProjectDomain
   tagline: string
   role: string
-  period: string
   stack: string[]
   link?: ProjectLink
   pitch: string

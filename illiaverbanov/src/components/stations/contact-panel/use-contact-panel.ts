@@ -1,7 +1,7 @@
 import { profile, UI_COPY } from '../../../data'
 import type { ContactItem } from '../../../data/types'
 
-const TELEGRAM_HANDLE = '@ilyaberbx'
+const TELEGRAM_HANDLE = '@enjoyea'
 const LINKEDIN_HANDLE = 'in/illia-verbanov'
 const GITHUB_HANDLE = 'ilyaberbx'
 

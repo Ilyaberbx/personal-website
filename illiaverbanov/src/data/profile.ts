@@ -7,8 +7,8 @@ export const profile: Profile = {
   email: 'ilyaberbx@gmail.com',
   phone: '+380 99 454 0187',
   links: {
-    linkedin: 'https://www.linkedin.com/in/illia-verbanov/',
-    telegram: 'https://t.me/ilyaberbx',
+    linkedin: 'https://www.linkedin.com/in/illia-verbanov-807027249/',
+    telegram: 'https://t.me/enjoyea',
     github: 'https://github.com/ilyaberbx',
   },
   summary:

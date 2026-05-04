@@ -13,7 +13,6 @@ export function ProjectCard({ project }: Props) {
 
       <div className={styles.meta}>
         <span><span className={styles.metaLabel}>Role:</span>{project.role}</span>
-        <span><span className={styles.metaLabel}>Period:</span>{project.period}</span>
       </div>
 
       <p className={styles.pitch}>{project.pitch}</p>

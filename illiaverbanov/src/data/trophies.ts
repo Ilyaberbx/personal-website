@@ -3,8 +3,8 @@ import type { Trophy } from './types'
 export const trophies: Trophy[] = [
   {
     title: 'Cumulative Trading Volume',
-    metric: '$600M+',
-    context: 'Decentra perpetuals platform across HyperLiquid, Lighter, Extended, NADO.',
+    metric: '$1B+',
+    context: 'Miracle trading platform — incentive and AI suggestion modules carrying production traffic.',
   },
   {
     title: 'Game Downloads',

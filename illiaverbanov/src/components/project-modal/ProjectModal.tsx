@@ -31,10 +31,6 @@ export function ProjectModal({ projectId, onClose }: ProjectModalProps) {
                     <span className={styles.metaLabel}>Role:</span>
                     {project.role}
                   </span>
-                  <span>
-                    <span className={styles.metaLabel}>Period:</span>
-                    {project.period}
-                  </span>
                 </div>
 
                 <p>{project.pitch}</p>
