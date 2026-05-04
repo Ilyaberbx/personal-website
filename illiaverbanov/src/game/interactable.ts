@@ -1,18 +1,18 @@
-import type { StationId } from '../data/types'
+import type { NpcId, StationId } from '../data/types'
 import type { Scene, SceneId, SceneSpawn } from './scenes/types'
 
 export type Tile = { tx: number; ty: number }
 
 export type WorldFocus =
   | { kind: 'station'; id: StationId }
-  | { kind: 'npc' }
+  | { kind: 'npc'; id: NpcId }
   | { kind: 'door'; targetSceneId: SceneId; targetSpawn: SceneSpawn; label: string; hint: string }
   | { kind: 'sculpture'; projectId: string }
   | null
 
 export type InteractableEntry =
   | { kind: 'station'; id: StationId; x: number; y: number }
-  | { kind: 'npc'; x: number; y: number }
+  | { kind: 'npc'; id: NpcId; x: number; y: number }
   | {
       kind: 'door'
       x: number
@@ -33,7 +33,7 @@ function manhattanDistance(ax: number, ay: number, bx: number, by: number): numb
 
 function toWorldFocus(entry: InteractableEntry): WorldFocus {
   if (entry.kind === 'station') return { kind: 'station', id: entry.id }
-  if (entry.kind === 'npc') return { kind: 'npc' }
+  if (entry.kind === 'npc') return { kind: 'npc', id: entry.id }
   if (entry.kind === 'sculpture') return { kind: 'sculpture', projectId: entry.projectId }
   return {
     kind: 'door',
@@ -78,6 +78,7 @@ export function buildRegistry(scene: Scene): InteractableEntry[] {
   }))
   const npcs: InteractableEntry[] = scene.npcs.map((n) => ({
     kind: 'npc',
+    id: n.id,
     x: n.x,
     y: n.y,
   }))

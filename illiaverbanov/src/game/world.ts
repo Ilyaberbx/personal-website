@@ -26,5 +26,6 @@ export function isSameFocus(a: WorldFocus, b: WorldFocus): boolean {
   if (a.kind === 'sculpture' && b.kind === 'sculpture') {
     return a.projectId === b.projectId
   }
+  if (a.kind === 'npc' && b.kind === 'npc') return a.id === b.id
   return true
 }

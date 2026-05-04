@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { STATIONS, UI_COPY, WANDERING_BARD, projects } from '../../data'
+import { NPCS, STATIONS, UI_COPY, projects } from '../../data'
 import type { StationId } from '../../data/types'
 import { VIEW_H, VIEW_W } from '../../game/engine'
 import { DialogBox } from '../dialog-box'
@@ -28,7 +28,7 @@ export function World({ onSwitchView }: Props) {
 
   const stationFocus = focus?.kind === 'station' ? STATIONS[focus.id] : null
   const doorFocus = focus?.kind === 'door' ? focus : null
-  const isNpcFocused = focus?.kind === 'npc'
+  const npcFocus = focus?.kind === 'npc' ? NPCS[focus.id] : null
   const sculptureFocus = focus?.kind === 'sculpture' ? focus : null
   const focusedProject = sculptureFocus
     ? projects.find((p) => p.id === sculptureFocus.projectId) ?? null
@@ -59,8 +59,8 @@ export function World({ onSwitchView }: Props) {
         {!modal && doorFocus && (
           <DialogBox label={doorFocus.label} hint={doorFocus.hint} variant="station" />
         )}
-        {!modal && isNpcFocused && (
-          <DialogBox label={WANDERING_BARD.name} hint={WANDERING_BARD.hint} variant="npc" />
+        {!modal && npcFocus && (
+          <DialogBox label={npcFocus.name} hint={npcFocus.hint} variant="npc" />
         )}
         {!modal && focusedProject && (
           <DialogBox
@@ -82,7 +82,7 @@ export function World({ onSwitchView }: Props) {
 
       {isStationModal && <StationModalForId id={modal.id} onClose={closeModal} />}
 
-      {isNpcModal && <NpcModal onClose={closeModal} />}
+      {isNpcModal && <NpcModal npcId={modal.id} onClose={closeModal} />}
 
       {isProjectModal && <ProjectModal projectId={modal.projectId} onClose={closeModal} />}
     </div>

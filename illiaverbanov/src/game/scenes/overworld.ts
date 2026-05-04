@@ -58,7 +58,7 @@ export const OVERWORLD: Scene = {
     { id: 'trophies', x: 25, y: 17 },
     { id: 'contact', x: 6, y: 17 },
   ],
-  npcs: [{ x: 17, y: 13 }],
+  npcs: [{ id: 'wandering-bard', x: 17, y: 13 }],
   sculptures: [],
 }
 

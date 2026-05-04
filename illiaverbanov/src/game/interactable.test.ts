@@ -11,7 +11,7 @@ const FIXTURE_STATIONS: InteractableEntry[] = [
   { kind: 'station', id: 'skills', x: 20, y: 10 },
 ]
 
-const FIXTURE_NPC: InteractableEntry = { kind: 'npc', x: 15, y: 8 }
+const FIXTURE_NPC: InteractableEntry = { kind: 'npc', id: 'wandering-bard', x: 15, y: 8 }
 
 const FIXTURE_REGISTRY: InteractableEntry[] = [...FIXTURE_STATIONS, FIXTURE_NPC]
 
@@ -36,7 +36,7 @@ describe('interactableAt — adjacent mode', () => {
   it('returns npc focus when tile is adjacent to the NPC', () => {
     const tile: Tile = { tx: 15, ty: 9 }
     const result = interactableAt(tile, 'adjacent', FIXTURE_REGISTRY)
-    expect(result).toEqual({ kind: 'npc' })
+    expect(result).toEqual({ kind: 'npc', id: 'wandering-bard' })
   })
 
   it('returns station focus when tile is below the station footprint', () => {
@@ -66,7 +66,7 @@ describe('interactableAt — exact mode', () => {
   it('returns npc focus when tile is the exact NPC tile', () => {
     const tile: Tile = { tx: 15, ty: 8 }
     const result = interactableAt(tile, 'exact', FIXTURE_REGISTRY)
-    expect(result).toEqual({ kind: 'npc' })
+    expect(result).toEqual({ kind: 'npc', id: 'wandering-bard' })
   })
 })
 

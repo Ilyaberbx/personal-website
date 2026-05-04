@@ -68,6 +68,6 @@ export const EXHIBITION_HALL: Scene = {
     },
   ],
   stations: [],
-  npcs: [],
+  npcs: [{ id: 'curator', x: 12, y: 12 }],
   sculptures: SCULPTURES,
 }

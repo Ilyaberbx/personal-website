@@ -1,4 +1,4 @@
-import type { StationId } from '../data/types'
+import type { NpcId, StationId } from '../data/types'
 import { createPlayer, spawnPlayer, updatePlayer, type PlayerState } from './player'
 import { computeCamera, renderWorld, type FocusKindForHighlight } from './renderer'
 import { buildRegistry, findFocus, isSameFocus, type WorldFocus } from './world'
@@ -23,7 +23,7 @@ const MAX_FRAME_SECONDS = 1 / 30
 
 export type EngineModal =
   | { kind: 'station'; id: StationId }
-  | { kind: 'npc' }
+  | { kind: 'npc'; id: NpcId }
   | { kind: 'project'; projectId: string }
   | null
 
@@ -179,7 +179,7 @@ export class Engine {
       return
     }
     if (f.kind === 'npc') {
-      this.setState({ modal: { kind: 'npc' } })
+      this.setState({ modal: { kind: 'npc', id: f.id } })
       return
     }
     if (f.kind === 'sculpture') {
@@ -234,7 +234,7 @@ export class Engine {
       this.setState({ modal: { kind: 'project', projectId: hit.projectId } })
       return true
     }
-    this.setState({ modal: { kind: 'npc' } })
+    this.setState({ modal: { kind: 'npc', id: hit.id } })
     return true
   }
 }

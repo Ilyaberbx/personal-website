@@ -1,5 +1,5 @@
 import type { TileId } from '../map'
-import type { StationId } from '../../data/types'
+import type { NpcId, StationId } from '../../data/types'
 import type { Facing } from '../sprites'
 
 export type SceneId = 'overworld' | 'exhibition-hall'
@@ -20,6 +20,7 @@ export type SceneStation = {
 }
 
 export type SceneNpc = {
+  id: NpcId
   x: number
   y: number
 }

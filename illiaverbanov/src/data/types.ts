@@ -47,8 +47,10 @@ export type Trophy = {
   context: string
 }
 
+export type NpcId = 'wandering-bard' | 'curator'
+
 export type NpcContent = {
-  id: 'wandering-bard'
+  id: NpcId
   name: string
   hint: string
   lines: string[]

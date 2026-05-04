@@ -1,14 +1,22 @@
 import { useEffect, useState } from 'react'
-import { profile, WANDERING_BARD } from '../../data'
+import { NPCS, profile } from '../../data'
+import type { NpcId } from '../../data/types'
 import { ADVANCE_KEYS } from '../../game/input-config'
 
 function isAdvanceKey(code: string): boolean {
   return ADVANCE_KEYS.has(code)
 }
 
-export function useNpcModal(onClose: () => void) {
+function buildLines(npcId: NpcId): string[] {
+  const npc = NPCS[npcId]
+  if (npcId === 'wandering-bard') return [...npc.lines, profile.summary]
+  return [...npc.lines]
+}
+
+export function useNpcModal(npcId: NpcId, onClose: () => void) {
   const [step, setStep] = useState(0)
-  const lines = [...WANDERING_BARD.lines, profile.summary]
+  const npc = NPCS[npcId]
+  const lines = buildLines(npcId)
   const isLast = step >= lines.length - 1
 
   function advance() {
@@ -34,7 +42,7 @@ export function useNpcModal(onClose: () => void) {
     step,
     lines,
     isLast,
-    bardName: WANDERING_BARD.name,
+    npcName: npc.name,
     advance,
   }
 }

@@ -52,6 +52,7 @@ describe('tileOccupant — overworld', () => {
   it('NPC tile has kind:npc, is not walkable, and is interactable', () => {
     const occ = tileOccupant(overworld, 17, 13)
     expect(occ.kind).toBe('npc')
+    if (occ.kind === 'npc') expect(occ.id).toBe('wandering-bard')
     expect(isWalkable(occ)).toBe(false)
     expect(isInteractable(occ)).toBe(true)
   })

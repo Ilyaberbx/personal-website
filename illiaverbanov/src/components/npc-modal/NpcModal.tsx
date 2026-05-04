@@ -1,4 +1,5 @@
 import { UI_COPY } from '../../data'
+import type { NpcId } from '../../data/types'
 import { getVoxelModelForFocus } from '../../game/voxel/voxel-registry'
 import { PixelWindow } from '../shared/PixelWindow'
 import { VoxelHero } from '../shared/voxel-hero/VoxelHero'
@@ -7,17 +8,17 @@ import { useNpcModal } from './use-npc-modal'
 import { NPC_MODAL_WIDTH } from './npc-modal.constants'
 import styles from './npc-modal.module.css'
 
-type Props = { onClose: () => void }
+type Props = { npcId: NpcId; onClose: () => void }
 
-export function NpcModal({ onClose }: Props) {
-  const { step, lines, isLast, bardName, advance } = useNpcModal(onClose)
+export function NpcModal({ npcId, onClose }: Props) {
+  const { step, lines, isLast, npcName, advance } = useNpcModal(npcId, onClose)
   const buttonLabel = isLast ? UI_COPY.npc.btnFarewell : UI_COPY.npc.btnNext
-  const voxelModel = getVoxelModelForFocus({ kind: 'npc' })
+  const voxelModel = getVoxelModelForFocus({ kind: 'npc', id: npcId })
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
       <div className={styles.stop} onClick={(e) => e.stopPropagation()}>
-        <PixelWindow title={bardName} onClose={onClose} width={NPC_MODAL_WIDTH}>
+        <PixelWindow title={npcName} onClose={onClose} width={NPC_MODAL_WIDTH}>
           <div className={styles.body}>
             {voxelModel && (
               <div className={styles.hero}>

@@ -1,4 +1,4 @@
-import type { StationId } from '../data/types'
+import type { NpcId, StationId } from '../data/types'
 import type { Scene, SceneProp } from './scenes/types'
 import { TILE, isBlockingTile, type TileId } from './map'
 
@@ -7,7 +7,7 @@ export type Occupant =
   | { kind: 'terrain'; tile: TileId }
   | { kind: 'prop'; prop: SceneProp }
   | { kind: 'station'; id: StationId; role: 'footprint' | 'head' }
-  | { kind: 'npc' }
+  | { kind: 'npc'; id: NpcId }
   | { kind: 'door'; doorIndex: number }
 
 function findStationOccupant(
@@ -38,8 +38,9 @@ function findNpcOccupant(
   x: number,
   y: number,
 ): Extract<Occupant, { kind: 'npc' }> | null {
-  const matches = scene.npcs.some((n) => n.x === x && n.y === y)
-  return matches ? { kind: 'npc' } : null
+  const npc = scene.npcs.find((n) => n.x === x && n.y === y)
+  if (!npc) return null
+  return { kind: 'npc', id: npc.id }
 }
 
 function findDoorOccupant(
