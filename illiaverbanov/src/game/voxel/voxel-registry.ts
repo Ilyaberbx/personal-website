@@ -6,8 +6,10 @@ import { CONTACT_VOXEL_MODEL } from './models/contact-model'
 import { EXPERIENCE_VOXEL_MODEL } from './models/experience-model'
 import { SKILLS_VOXEL_MODEL } from './models/skills-model'
 import { TROPHIES_VOXEL_MODEL } from './models/trophies-model'
-import { SCULPTURE_PLACEHOLDER_VOXEL_MODEL } from './models/sculpture-placeholder-model'
-import { getSculptureVoxelModel } from './project-sculptures'
+import {
+  PROJECT_SCULPTURE_MODEL_LIST,
+  getSculptureVoxelModel,
+} from './project-sculptures'
 
 const STATION_MODELS: Record<string, VoxelModel> = {
   about: ABOUT_VOXEL_MODEL,
@@ -32,5 +34,5 @@ export const VOXEL_MODELS: readonly VoxelModel[] = [
   EXPERIENCE_VOXEL_MODEL,
   SKILLS_VOXEL_MODEL,
   TROPHIES_VOXEL_MODEL,
-  SCULPTURE_PLACEHOLDER_VOXEL_MODEL,
+  ...PROJECT_SCULPTURE_MODEL_LIST,
 ]
